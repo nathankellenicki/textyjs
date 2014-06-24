@@ -1,0 +1,26 @@
+{
+    "title": "title",
+    "greeting": "greeting",
+    "creator": "creator",
+    "player": {
+        "position": "testroom",
+        "inventory": {},
+        "attributes": {}
+    },
+    "rooms": {
+        "testroom": {
+            "description": "testroom",
+            "exits": {},
+            "objects": {}
+        }
+    },
+    "objects": [
+        {
+            "id": "campfire",
+            "unique": true,
+            "attainable": false,
+            "title": "A small campfire."
+        }
+    ],
+    "characters": []
+}

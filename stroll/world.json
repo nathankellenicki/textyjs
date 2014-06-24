@@ -1,0 +1,56 @@
+{
+    "title": "A Stroll in the Forest",
+    "greeting": "Welcome to A Stroll in the Forest!",
+    "creator": "Nathan Kunicki",
+    "player": {
+        "position": "clearing",
+        "inventory": {},
+        "attributes": {
+            "headache": true
+        }
+    },
+    "rooms": {
+        "clearing": {
+            "description": "As you open your eyes, you discover yourself surrounded by trees. You have a thumping headache and can't remember what happened before you passed out.",
+            "exits": {
+                "west": {
+                    "to": "river",
+                    "description": "to the river"
+                }
+            },
+            "objects": {
+                "campfire": 1,
+                "stick": 1
+            }
+        },
+        "river": {
+            "description": "As you walk, you stumble across a small river. Despite it's size, you can see it's flowing quite rapidly and looks quite dangerous.",
+            "exits": {
+                "east": {
+                    "to": "clearing",
+                    "description": "to the clearing"
+                }
+            },
+            "objects": {}
+        }
+    },
+    "objects": {
+        "campfire": {
+            "unique": true,
+            "attainable": false,
+            "description": "A small campfire.",
+            "commands": {
+                "extinguish": "./objects.js:extinguishCampfire"
+            }
+        },
+        "stick": {
+            "unique": true,
+            "description": "A stick that's clearly broken off a tree.",
+            "commands": {
+                "break": "./objects.js:breakStick",
+                "throw": "./objects.js:throwStick"
+            }
+        }
+    },
+    "characters": []
+}
