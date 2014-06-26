@@ -1,6 +1,5 @@
 // Requires
-var util = require('util'),
-    events = require('events');
+var util = require('util');
 
 // Load config
 var configSettings = JSON.parse(require('fs').readFileSync(__dirname + '/config.json'));
@@ -9,27 +8,30 @@ var configSettings = JSON.parse(require('fs').readFileSync(__dirname + '/config.
 var Texty = function (config) {
 
     self = this;
-    events.EventEmitter.call(self);
 
     var config = config || {};
+
+    // Event handler warehouse
+    self.eventHandlers = {}
 
     // Load modules
     self.modules = {
         utils: (require(__dirname + '/lib/utils.js'))()
     }
 
-    var availableModules = ['commandParser', 'gameMessaging', 'gameController'];
+    var availableModules = ['commandParser', 'gameMessaging', 'gameController', 'socialController', 'socialMessaging'];
 
     for (var module in availableModules) {
-        self.modules[availableModules[module]] = config.modules[availableModules[module]] ? (config.modules[availableModules[module]](self.modules)) : (require(__dirname + '/lib/' + availableModules[module] + '.js'))(self.modules);
+        self.modules[availableModules[module]] = config.modules[availableModules[module]] ? (config.modules[availableModules[module]](self, self.modules)) : (require(__dirname + '/lib/' + availableModules[module] + '.js'))(self, self.modules);
     }
 
     // Start the world
     self.worldTemplate = config.world;
-    self.world = self.preprocessWorld(JSON.parse(JSON.stringify(self.worldTemplate)));
+    self.world = self.instantiateWorld();
 
     // Create the player store
     self.players = {};
+    self.parties = [];
 
     if (config.auth) {
     	self.auth = config.auth;
@@ -41,7 +43,6 @@ var Texty = function (config) {
 }
 
 // Assign to exports
-util.inherits(Texty, events.EventEmitter);
 module.exports = Texty;
 
 // Convert a datastore object to a game object
@@ -54,6 +55,7 @@ Texty.prototype.createNewState = function (player) {
     // We do this to deliberately make sure that the clone of the starting player object does not contain any methods or logic
     // NOTE: Perhaps not the most performant way of doing this?!
     var gameState = JSON.parse(JSON.stringify(this.world.player));
+    gameState.player = player;
     return gameState;
 }
 
@@ -63,8 +65,8 @@ Texty.prototype.displayWelcome = function () {
 }
 
 // This is used for preprocessing the world object into something a little bit more performant, ie. turning arrays into hashes, etc.
-Texty.prototype.preprocessWorld = function (world) {
-    return world;
+Texty.prototype.instantiateWorld = function () {
+    return JSON.parse(JSON.stringify(this.worldTemplate))
 }
 
 
@@ -73,7 +75,23 @@ Texty.prototype.parseCommand = function (player, command, callback) {
     this.modules.commandParser.parseCommand(this.world, this.players[player], command, callback);
 }
 
+
 // Starts the game
 Texty.prototype.start = function (player, initialState, callback) {
     this.players[player] = this.modules.gameController.switchRooms(this.world, initialState, initialState.position, callback);
+}
+
+
+// External event handler registration
+Texty.prototype.on = function (event, callback) {
+    this.eventHandlers[event] = callback;
+}
+
+
+// Internal event handler trigger
+Texty.prototype.triggerGameEvent = function (player, data) {
+    if (this.eventHandlers['gameEvent']) {
+        return this.eventHandlers['gameEvent'](player, data);
+    }
+    return true;
 }

@@ -1,9 +1,10 @@
 // Create the constructor
-var CommandParser = function (config) {
+var CommandParser = function (textyObj, config) {
 
 	var self = this;
 
 	self.modules = config;
+	self.textyObj = textyObj;
     console.log("CommandParser initialized");
 
 }
@@ -64,7 +65,7 @@ CommandParser.prototype.assembleCommandList = function (world, gameState) {
 		}
 	}
 
-	// Add items from immediate area to command list (NOTE: Revamp, should use GameController and GameMessaging modules) (NOTE: It already does?!)
+	// Add items from immediate area to command list
 	commandList['look at'] = function (world, gameState, options, callback) {
 		self.modules.gameController.lookAtItem(world, gameState, options, callback);
 	}
@@ -77,12 +78,31 @@ CommandParser.prototype.assembleCommandList = function (world, gameState) {
 		self.modules.gameController.dropItem(world, gameState, options, callback);
 	}
 
+	// Multiplayer and party implementation stuff goes here (NOTE: Perhaps this should be turned on/off depending on whether Texty is used client or server side)
+	// NOTE2: This should totally be in a multiplayerController.js file. Get it out of here.
+
+	commandList['players'] = function (world, gameState, options, callback) {
+		self.modules.socialController.displayLocalPlayers(world, gameState, callback);
+	}
+
+	commandList['message'] = function (world, gameState, options, callback) {
+		if (options.split(' ').length >= 2) {
+			self.modules.socialController.sendMessage(gameState, options.split(' ', 2)[0], options.split(' ', 2)[1], callback);
+		} else {
+			callback('Could not send message.\r\n\r\n');
+		}
+	}
+
+	commandList['party invite'] = function (world, gameState, options, callback) {
+		self.modules.socialController.inviteToParty(gameState, options, callback);
+	}
+
 	return commandList;
 
 }
 
 
 // Assign to exports
-module.exports = function (config) {
-	return (new CommandParser(config));
+module.exports = function (textyObj, config) {
+	return (new CommandParser(textyObj, config));
 };

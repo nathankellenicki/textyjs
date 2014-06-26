@@ -14,7 +14,7 @@ var TCPConnection = function (texty, config) {
     };
 
     // Keep track of client connections
-    self.clients = [];
+    self.clients = {};
 
     // Listen
     net.createServer(function (socket) {
@@ -28,7 +28,7 @@ var TCPConnection = function (texty, config) {
             return v.toString(16);
         });
 
-        self.clients.push(socket);
+        self.clients[socket.userData.sessionId] = socket;
 
         // Emit on a new connection
         self.emit('connection', socket.userData, function (res) {
@@ -71,5 +71,7 @@ module.exports = TCPConnection;
 
 // Method for sending data back to clients external to this module
 TCPConnection.prototype.sendData = function (sessionId, data) {
-    // Do stuff
+    if (this.clients[sessionId]) {
+        this.clients[sessionId].write(data);
+    }
 }

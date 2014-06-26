@@ -31,6 +31,9 @@ tcp.on('connection', function (session, callback) {
     return;
 });
 
+// Session store
+var sessions = {};
+
 tcp.on('command', function (session, command, callback) {
     
     session.auth = session.auth || {};
@@ -49,6 +52,8 @@ tcp.on('command', function (session, command, callback) {
 
                     session.auth.authenticated = true;
                     session.auth.userId = res;
+
+                    sessions[session.auth.username] = session;
 
                     // Now that we're authenticated, attempt to load the game state from Redis
                     redis.load(session.auth.userId, function (err, res) {
@@ -100,7 +105,11 @@ tcp.on('command', function (session, command, callback) {
     }
 });
 
-game.on('gameEvent', function (session, data) {
-    tcp.sendData(data);
-    return;
+game.on('gameEvent', function (player, data) {
+    if (sessions[player]) {
+        tcp.sendData(sessions[player].sessionId, data);
+        return true;
+    } else {
+        return false;
+    }
 });

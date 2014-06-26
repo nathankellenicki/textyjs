@@ -2,7 +2,7 @@
 var Utils = (require('./utils.js'))();
 
 // Create the constructor
-var GameMessaging = function (config) {
+var GameMessaging = function (textyObj, config) {
 
 	var self = this;
 
@@ -138,6 +138,6 @@ GameMessaging.prototype.dropItem = function (world, gameState, item) {
 
 
 // Assign to exports
-module.exports = function (config) {
-	return (new GameMessaging(config));
+module.exports = function (textyObj, config) {
+	return (new GameMessaging(textyObj, config));
 };

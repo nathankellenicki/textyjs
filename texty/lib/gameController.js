@@ -1,9 +1,10 @@
 // Create the constructor
-var GameController = function (config) {
+var GameController = function (textyObj, config) {
 
 	var self = this;
 
 	self.modules = config;
+    self.textyObj = textyObj;
     console.log('GameController initialized');
 
 }
@@ -109,6 +110,6 @@ GameController.prototype.dropItem = function (world, gameState, item, callback) 
 
 
 // Assign to exports
-module.exports = function (config) {
-	return (new GameController(config));
+module.exports = function (textyObj, config) {
+	return (new GameController(textyObj, config));
 };
