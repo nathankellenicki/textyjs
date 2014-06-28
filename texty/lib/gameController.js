@@ -1,5 +1,5 @@
-define([],
-function () {
+define(['mustache'],
+function (Mustache) {
 
     // Create the constructor
     var GameController = function (textyObj, config) {
@@ -48,7 +48,9 @@ function () {
         if (world.rooms[gameState.position].objects[item] || gameState.inventory[item]) {
             callback(this.modules.gameMessaging.displayItem(world, gameState, item));
         } else {
-            callback('Cannot find ' + item + '.\r\n\r\n');
+            callback(Mustache.render(this.textyObj.template.game.items.notfound, {
+                name: item
+            }));
         }
 
     }
@@ -76,11 +78,15 @@ function () {
                 callback(this.modules.gameMessaging.pickUpItem(world, gameState, item));
 
             } else {
-                callback('Cannot pick up ' + item + '.\r\n\r\n');    
+                callback(Mustache.render(this.textyObj.template.game.items.notattainable, {
+                    name: item
+                })); 
             }
 
         } else {
-            callback('Cannot find ' + item + '.\r\n\r\n');
+            callback(Mustache.render(this.textyObj.template.game.items.notfound, {
+                name: item
+            }));
         }
 
     }
@@ -106,7 +112,9 @@ function () {
             callback(this.modules.gameMessaging.dropItem(world, gameState, item));
 
         } else {
-            callback('Cannot drop ' + item + '.\r\n\r\n');
+            callback(Mustache.render(this.textyObj.template.game.items.notdropable, {
+                name: item
+            }));
         }
 
     }

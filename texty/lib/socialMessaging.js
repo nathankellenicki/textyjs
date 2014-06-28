@@ -1,5 +1,5 @@
-define(['texty/lib/utils'],
-function (utils) {
+define(['texty/lib/utils', 'mustache'],
+function (utils, Mustache) {
 
 	// Load modules
 	var Utils = utils();
@@ -19,20 +19,18 @@ function (utils) {
 	// Display local players inthe area (Different behaviour for public vs instanced rooms)
 	SocialMessaging.prototype.displayLocalPlayers = function (world, gameState) {
 		
-		var playerList = [],
+		var players = [],
 			msg = '';
 
 		for (var player in this.textyObj.players) {
 			if (this.textyObj.players[player].position == gameState.position) {
-				playerList.push(player);
+				players.push(player);
 			}
 		}
 
-		msg = 'Players in the area:\r\n';
-		msg += playerList.join('\r\n');
-		msg += '\r\n\r\n';
-
-		return msg;
+		return Mustache.render(this.textyObj.template.social.area.players, {
+            players: players
+        });
 
 	}
 

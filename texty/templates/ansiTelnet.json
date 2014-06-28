@@ -1,0 +1,45 @@
+{
+	"game": {
+		"welcome": "\r\n----------\r\n\r\n\u001b[1m{{& title}}\u001b[0m\r\n\r\n{{& greeting}}\r\n\r\nTo continue, press \u001b[1menter\u001b[0m",
+		"room": "\r\n----------\r\n\r\n{{& description}}\r\n\r\n",
+		"directions": {
+			"exists": "Directions:\r\n{{#directions}}\u001b[1m{{& direction}}\u001b[0m {{& description}}\r\n{{/directions}}\r\n\r\n",
+			"none": "There is nowhere you can go right now.\r\n\r\n"
+		},
+		"items": {
+			"listing": {
+				"items": "Items in the vicinity:\r\n{{#items}}{{count}}x \u001b[1m{{& name}}\u001b[0m\r\n{{/items}}\r\n\r\n",
+				"noitems": "There are no items here.\r\n\r\n"
+			},
+			"lookat": "{{& description}}\r\n\r\n",
+			"pickup": "Picked up {{& name}}.\r\n\r\n",
+			"drop": "Dropped {{& name}}.\r\n\r\n",
+			"notfound": "Cannot find {{& name}}.\r\n\r\n",
+			"notattainable": "This item can not be picked up.\r\n\r\n",
+			"notdropable": "This item is not in your inventory.\r\n\r\n"
+		},
+		"inventory": {
+			"listing": {
+				"items": "Items in your inventory:\r\n{{#items}}{{count}}x \u001b[1m{{& name}}\u001b[0m\r\n{{/items}}\r\n\r\n",
+				"noitems": "There are no items in your inventory.\r\n\r\n"
+			}
+		}
+	},
+	"social": {
+		"messaging": {
+			"sent": "Message sent.\r\n\r\n",
+			"received": "Message from {{& fromPlayer}}: {{& message}}\r\n\r\n",
+			"notsent": "Could not send message to {{& toPlayer}}.\r\n\r\n"
+		},
+		"party": {
+			"cannotinviteself": "You cannot invite yourself to a party.\r\n\r\n",
+			"playerdoesntexist": "Cannot find {{& toPlayer}}.\r\n\r\n",
+			"alreadyinparty": "Player is already in a party.\r\n\r\n",
+			"addedby": "You were added to a party by {{& fromPlayer}}.\r\n\r\n",
+			"successfullyadded": "Added {{& toPlayer}}.\r\n\r\n"
+		},
+		"area": {
+			"players": "Players in the area:\r\n{{#players}}{{& .}}\r\n{{/players}}\r\n\r\n"
+		}
+	}
+}

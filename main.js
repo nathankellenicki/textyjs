@@ -13,11 +13,13 @@ requirejs.config({
 requirejs(['Texty', 'TCPConnection', 'RedisStore', 'fs'],
 function (Texty, TCPConnection, RedisStore, fs) {
 
-    // Load the game module
-    var world = JSON.parse(fs.readFileSync(__dirname + '/stroll/world.json'));
+    // Load the game module and template
+    var world = JSON.parse(fs.readFileSync(__dirname + '/stroll/world.json')),
+        template = JSON.parse(fs.readFileSync(__dirname + '/texty/templates/ansiTelnet.json'));
 
     // Initialize the Texty module with the game
     var game = new Texty({
+        template: template,
         world: world
     });
 

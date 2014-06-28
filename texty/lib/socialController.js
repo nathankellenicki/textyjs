@@ -1,5 +1,5 @@
-define([],
-function () {
+define(['mustache'],
+function (Mustache) {
 
 	// Create the constructor
 	var SocialController = function (textyObj, config) {
@@ -17,11 +17,13 @@ function () {
 	SocialController.prototype.sendInfo = function (gameState, toPlayer, message, callback) {
 		if (this.textyObj.triggerGameEvent(toPlayer, message)) {
 			if (callback) {
-				callback('Message sent.\r\n\r\n');
+				callback(Mustache.render(this.textyObj.template.social.messaging.sent));
 			}
 		} else {
 			if (callback) {
-				callback('Could not send message to ' + toPlayer + '.\r\n\r\n');
+				callback(Mustache.render(this.textyObj.template.social.messaging.notsent, {
+		            toPlayer: toPlayer
+		        }));
 			}
 		}
 	}
@@ -35,7 +37,10 @@ function () {
 
 	// Send a message to a user
 	SocialController.prototype.sendMessage = function (gameState, toPlayer, message, callback) {
-		this.sendInfo(gameState, toPlayer, 'Message from ' + gameState.player + ': ' + message + '\r\n\r\n', callback);
+		this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.template.social.messaging.received, {
+            fromPlayer: gameState.player,
+            message: message
+        }), callback);
 	}
 
 
@@ -44,13 +49,21 @@ function () {
 
 		// It's yourself stupid!
 		if (gameState.player == toPlayer) {
-			callback('You cannot invite yourself to a party.\r\n\r\n');
+			callback(Mustache.render(this.textyObj.template.social.party.cannotinviteself));
+			return;
+		}
+
+		// Player doesn't exist!
+		if (!this.textyObj.players[toPlayer]) {
+			callback(Mustache.render(this.textyObj.template.social.party.playerdoesntexist, {
+				toPlayer: toPlayer
+			}));
 			return;
 		}
 
 		// If toPlayer is already in a party, decline party invite.
 		if (!!this.textyObj.players[toPlayer].party) {
-			callback('Player is already in a party.\r\n\r\n');
+			callback(Mustache.render(this.textyObj.template.social.party.alreadyinparty));
 			return;
 		} else {
 			
@@ -72,8 +85,12 @@ function () {
 			// Add the toPlayer to the party (Which should now exist, regardless)
 			gameState.party.players.push(this.textyObj.players[toPlayer]);
 			this.textyObj.players[toPlayer].party = gameState.party;
-			this.sendInfo(gameState, toPlayer, 'You were added to a party by ' + gameState.player + '.\r\n\r\n');
-			callback('Added ' + toPlayer + ' to party.\r\n\r\n');
+			this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.template.social.party.addedby, {
+				fromPlayer: gameState.player
+			}));
+			callback(Mustache.render(this.textyObj.template.social.party.successfullyadded, {
+				toPlayer: toPlayer
+			}));
 
 		}
 

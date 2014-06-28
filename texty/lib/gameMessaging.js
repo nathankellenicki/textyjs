@@ -1,5 +1,5 @@
-define(['texty/lib/utils'],
-function (utils) {
+define(['texty/lib/utils', 'mustache'],
+function (utils, Mustache) {
 
 	// Load modules
 	var Utils = utils();
@@ -10,6 +10,7 @@ function (utils) {
 		var self = this;
 
 		self.modules = config;
+		self.textyObj = textyObj;
 	    console.log('GameMessaging initialized');
 
 	}
@@ -18,15 +19,10 @@ function (utils) {
 	// Format the display
 	GameMessaging.prototype.displayWelcome = function (world) {
 
-		//var msg = Utils.ansi('2J');
-		var msg = '\r\n----------\r\n\r\n';
-
-	    msg += Utils.ansi('1m', world.title) + '\r\n\r\n';
-	    msg += world.greeting + '\r\n\r\n';
-
-	    msg += 'To continue, press ' + Utils.ansi('1m', 'enter') + '';
-
-	    return msg;
+	    return Mustache.render(this.textyObj.template.game.welcome, {
+	    	title: world.title,
+	    	greeting: world.greeting
+	    });
 
 	}
 
@@ -34,10 +30,12 @@ function (utils) {
 	// Format room display
 	GameMessaging.prototype.displayRoom = function (world, gameState, room) {
 
-		//var msg = Utils.ansi('2J');
-		var msg = '\r\n----------\r\n\r\n';
+		var msg = '';
 	    
-	    msg += world.rooms[room].description + '\r\n\r\n';
+	    msg += Mustache.render(this.textyObj.template.game.room, {
+	    	description: world.rooms[room].description
+	    });
+
 	    msg += this.displayDirections(world, gameState, room);
 	    msg += this.displayItems(world, gameState, room);
 
@@ -53,16 +51,21 @@ function (utils) {
 
 		if (Utils.numProperties(exits) > 0) {
 
-			msg += 'Directions:\r\n';
+			var directions = [];
 
 			for (var room in exits) {
-				msg += Utils.ansi('1m', room) + ' ' + exits[room].description + '\r\n';
+				directions.push({
+					direction: room,
+					description: exits[room].description
+				});
 			}
 
-			msg += '\r\n';
+			msg += Mustache.render(this.textyObj.template.game.directions.exists, {
+				directions: directions
+			});
 
 		} else {
-			msg += 'There is nowhere you can go right now.\r\n\r\n';
+			msg += Mustache.render(this.textyObj.template.game.directions.none);
 		}
 		
 		return msg;
@@ -77,18 +80,23 @@ function (utils) {
 
 		if (Utils.numProperties(objects) > 0) {
 
-			msg += 'Items in the vicinity:\r\n';
+			var items = [];
 
 			for (var item in objects) {
 				if (objects[item] >= 1) {
-					msg += objects[item] + 'x ' + Utils.ansi('1m', item) + '\r\n';
+					items.push({
+						count: objects[item],
+						name: item
+					});
 				}
 			}
 
-			msg += '\r\n';
+			msg += Mustache.render(this.textyObj.template.game.items.listing.items, {
+				items: items
+			});
 
 		} else {
-			msg += 'There are no items here.\r\n\r\n';
+			msg += Mustache.render(this.textyObj.template.game.items.listing.noitems);
 		}
 
 		return msg;
@@ -103,18 +111,23 @@ function (utils) {
 
 		if (Utils.numProperties(gameState.inventory) > 0) {
 
-			msg += 'Items in your inventory:\r\n';
+			var items = [];
 
 			for (var item in gameState.inventory) {
 				if (gameState.inventory[item] >= 1) {
-					msg += gameState.inventory[item] + 'x ' + Utils.ansi('1m', item) + '\r\n';
+					items.push({
+						count: gameState.inventory[item],
+						name: item
+					});
 				}
 			}
 
-			msg += '\r\n';
+			msg += Mustache.render(this.textyObj.template.game.inventory.listing.items, {
+				items: items
+			});
 
 		} else {
-			msg = 'There are no items in your inventory.\r\n\r\n';
+			msg = Mustache.render(this.textyObj.template.game.inventory.listing.noitems);
 		}
 
 		return msg;
@@ -124,19 +137,25 @@ function (utils) {
 
 	// Display item (Look at item)
 	GameMessaging.prototype.displayItem = function (world, gameState, item) {
-		return world.objects[item].description + '\r\n\r\n';
+		return Mustache.render(this.textyObj.template.game.items.lookat, {
+			description: world.objects[item].description
+		});
 	}
 
 
 	// Pick up item (Look at item)
 	GameMessaging.prototype.pickUpItem = function (world, gameState, item) {
-		return 'Picked up ' + item + '.\r\n\r\n';
+		return Mustache.render(this.textyObj.template.game.items.pickup, {
+			name: item
+		});
 	}
 
 
 	// Drop item (Look at item)
 	GameMessaging.prototype.dropItem = function (world, gameState, item) {
-		return 'Dropped ' + item + '.\r\n\r\n';
+		return Mustache.render(this.textyObj.template.game.items.drop, {
+			name: item
+		});
 	}
 
 

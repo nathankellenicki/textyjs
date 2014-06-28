@@ -20,6 +20,9 @@ function (require, utils, commandParser, gameMessaging, gameController, socialCo
         // Event handler warehouse
         self.eventHandlers = {}
 
+        // Load template
+        self.template = config.template;
+
         // Load modules
         self.modules = {
             utils: utils()
