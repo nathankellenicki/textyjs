@@ -90,7 +90,7 @@ function () {
 
 		commandList['message'] = function (world, gameState, options, callback) {
 			if (options.split(' ').length >= 2) {
-				self.modules.socialController.sendMessage(gameState, options.split(' ', 2)[0], options.split(' ', 2)[1], callback);
+				self.modules.socialController.sendMessage(gameState, options.split(' ', 2)[0], options.slice(options.indexOf(' ') + 1), callback);
 			} else {
 				callback('Could not send message.\r\n\r\n');
 			}
