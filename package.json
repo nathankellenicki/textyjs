@@ -10,7 +10,7 @@
 	"dependencies": {
 		"nodejs-ansibuffer": "0.0.x",
 		"requirejs": "2.1.x",
-                "aws-sdk": "2.0.x"
+        "aws-sdk": "2.0.x"
 	},
 	"engines": {
 		"node": ">=0.10.24"

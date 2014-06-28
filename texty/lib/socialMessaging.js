@@ -1,40 +1,45 @@
-// Load modules
-var Utils = (require('./utils.js'))();
+define(['texty/lib/utils'],
+function (utils) {
 
-// Create the constructor
-var SocialMessaging = function (textyObj, config) {
+	// Load modules
+	var Utils = utils();
 
-	var self = this;
+	// Create the constructor
+	var SocialMessaging = function (textyObj, config) {
 
-	self.modules = config;
-	self.textyObj = textyObj;
-    console.log('SocialMessaging initialized');
+		var self = this;
 
-}
+		self.modules = config;
+		self.textyObj = textyObj;
+	    console.log('SocialMessaging initialized');
 
-
-// Display local players inthe area (Different behaviour for public vs instanced rooms)
-SocialMessaging.prototype.displayLocalPlayers = function (world, gameState) {
-	
-	var playerList = [],
-		msg = '';
-
-	for (var player in this.textyObj.players) {
-		if (this.textyObj.players[player].position == gameState.position) {
-			playerList.push(player);
-		}
 	}
 
-	msg = 'Players in the area:\r\n';
-	msg += playerList.join('\r\n');
-	msg += '\r\n\r\n';
 
-	return msg;
+	// Display local players inthe area (Different behaviour for public vs instanced rooms)
+	SocialMessaging.prototype.displayLocalPlayers = function (world, gameState) {
+		
+		var playerList = [],
+			msg = '';
 
-}
+		for (var player in this.textyObj.players) {
+			if (this.textyObj.players[player].position == gameState.position) {
+				playerList.push(player);
+			}
+		}
+
+		msg = 'Players in the area:\r\n';
+		msg += playerList.join('\r\n');
+		msg += '\r\n\r\n';
+
+		return msg;
+
+	}
 
 
-// Assign to exports
-module.exports = function (textyObj, config) {
-	return (new SocialMessaging(textyObj, config));
-};
+	// Assign to exports
+	return function (textyObj, config) {
+		return (new SocialMessaging(textyObj, config));
+	};
+
+});
