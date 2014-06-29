@@ -3,12 +3,10 @@ define([
     'require',
     'texty/lib/utils',
     'texty/lib/commandParser',
-    'texty/lib/gameMessaging',
-    'texty/lib/gameController',
-    'texty/lib/socialController',
-    'texty/lib/socialMessaging'
+    'texty/lib/controllers/game',
+    'texty/lib/controllers/social',
 ],
-function (require, utils, commandParser, gameMessaging, gameController, socialController, socialMessaging) {
+function (require, utils, commandParser, gameController, socialController) {
 
     // Create the constructor
     var Texty = function (config) {
@@ -20,19 +18,13 @@ function (require, utils, commandParser, gameMessaging, gameController, socialCo
         // Event handler warehouse
         self.eventHandlers = {}
 
-        // Load template
-        self.template = config.template;
+        // Initialise controllers
+        self.commandParser = commandParser(self);
 
-        // Load modules
-        self.modules = {
-            utils: utils()
-        }
-
-        var availableModules = ['commandParser', 'gameMessaging', 'gameController', 'socialController', 'socialMessaging'];
-
-        for (var module in availableModules) {
-            self.modules[availableModules[module]] = (config.modules && config.modules[availableModules[module]]) ? (config.modules[availableModules[module]](self, self.modules)) : eval(availableModules[module] + '(self, self.modules)');
-        }
+        self.controllers = {
+            game: gameController(self),
+            social: socialController(self)
+        };
 
         // Start the world
         self.worldTemplate = config.world;
@@ -52,22 +44,30 @@ function (require, utils, commandParser, gameMessaging, gameController, socialCo
     }
 
     // Convert a datastore object to a game object
-    Texty.prototype.initializeState = function (stateObj) {
-        return stateObj;
+    Texty.prototype.initializeState = function (player, stateObj, template) {
+        return {
+            player: player,
+            template: template,
+            roomHistory: [],
+            warehouse: stateObj
+        };
     }
 
     // Create a new game object based on the starting prototype
-    Texty.prototype.createNewState = function (player) {
+    Texty.prototype.createNewState = function (player, template) {
         // We do this to deliberately make sure that the clone of the starting player object does not contain any methods or logic
         // NOTE: Perhaps not the most performant way of doing this?!
-        var gameState = JSON.parse(JSON.stringify(this.world.player));
-        gameState.player = player;
-        return gameState;
+        return {
+            player: player,
+            template: template,
+            roomHistory: [],
+            warehouse: JSON.parse(JSON.stringify(this.world.player))
+        };
     }
 
     // Clears the screen and displays the welcome message
-    Texty.prototype.displayWelcome = function () {
-        return this.modules.gameMessaging.displayWelcome(this.world);
+    Texty.prototype.displayWelcome = function (gameState) {
+        return this.controllers.game.welcome(this.world, gameState);
     }
 
     // This is used for preprocessing the world object into something a little bit more performant, ie. turning arrays into hashes, etc.
@@ -77,14 +77,14 @@ function (require, utils, commandParser, gameMessaging, gameController, socialCo
 
 
     // Parse incoming commands
-    Texty.prototype.parseCommand = function (player, command, callback) {
-        this.modules.commandParser.parseCommand(this.world, this.players[player], command, callback);
+    Texty.prototype.parseCommand = function (gameState, command, callback) {
+        this.commandParser.parseCommand(gameState, command, callback);
     }
 
 
     // Starts the game
-    Texty.prototype.start = function (player, initialState, callback) {
-        this.players[player] = this.modules.gameController.switchRooms(this.world, initialState, initialState.position, callback);
+    Texty.prototype.start = function (initialState, callback) {
+        this.players[initialState.player] = this.controllers.game.switchRooms(this.world, initialState, initialState.warehouse.position, callback);
     }
 
 
@@ -95,9 +95,9 @@ function (require, utils, commandParser, gameMessaging, gameController, socialCo
 
 
     // Internal event handler trigger
-    Texty.prototype.triggerGameEvent = function (player, data) {
+    Texty.prototype.triggerGameEvent = function (gameState, data) {
         if (this.eventHandlers['gameEvent']) {
-            return this.eventHandlers['gameEvent'](player, data);
+            return this.eventHandlers['gameEvent'](gameState, data);
         }
         return true;
     }

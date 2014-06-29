@@ -19,7 +19,6 @@ function (Texty, TCPConnection, RedisStore, fs) {
 
     // Initialize the Texty module with the game
     var game = new Texty({
-        template: template,
         world: world
     });
 
@@ -69,14 +68,14 @@ function (Texty, TCPConnection, RedisStore, fs) {
 
                             if (!err) {
                                 // Convert the loaded user state object into a compatible game state
-                                session.gameState = game.initializeState(res);
+                                session.gameState = game.initializeState(session.auth.userId, res, template);
                                 console.log('Game state loaded for user id ' + session.auth.userId);
-                                callback(game.displayWelcome());
+                                callback(game.displayWelcome(session.gameState));
                             } else {
                                 // Create a new user game state object
-                                session.gameState = game.createNewState(session.auth.userId);
+                                session.gameState = game.createNewState(session.auth.userId, template);
                                 console.log('Game state created from scratch for user id ' + session.auth.userId);
-                                callback(game.displayWelcome());
+                                callback(game.displayWelcome(session.gameState));
                             }
 
                         });
@@ -98,7 +97,7 @@ function (Texty, TCPConnection, RedisStore, fs) {
             if (!session.auth.started) {
                 // Begin the game and show the players last state
                 session.auth.started = true;
-                game.start(session.auth.username, session.gameState, function (data) {
+                game.start(session.gameState, function (data) {
                     callback(data);
                 });
                 return;
@@ -107,16 +106,16 @@ function (Texty, TCPConnection, RedisStore, fs) {
             // From now on, defer all commands to the command parser so that the game can take over
             // NOTE: Maybe unless the command starts with "texty" or something? Might need a bit of rearchitecting
             // NOTE 2: Actually, the parseCommand method shouldn't be responsible for the prefixing. We should check it outside, and only send it to Texty if it's supposed to go there.
-            game.parseCommand(session.auth.username, command, function (data) {
+            game.parseCommand(session.gameState, command, function (data) {
                 callback(data);
                 return;
             });
         }
     });
 
-    game.on('gameEvent', function (player, data) {
-        if (sessions[player]) {
-            tcp.sendData(sessions[player].sessionId, data);
+    game.on('gameEvent', function (gameState, data) {
+        if (sessions[gameState.player]) {
+            tcp.sendData(sessions[gameState.player].sessionId, data);
             return true;
         } else {
             return false;

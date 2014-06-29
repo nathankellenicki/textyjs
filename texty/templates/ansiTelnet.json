@@ -4,7 +4,8 @@
 		"room": "\r\n----------\r\n\r\n{{& description}}\r\n\r\n",
 		"directions": {
 			"exists": "Directions:\r\n{{#directions}}\u001b[1m{{& direction}}\u001b[0m {{& description}}\r\n{{/directions}}\r\n\r\n",
-			"none": "There is nowhere you can go right now.\r\n\r\n"
+			"none": "There is nowhere you can go right now.\r\n\r\n",
+			"instanced": "This place is too dangerous to go without a party.\r\n\r\n"
 		},
 		"items": {
 			"listing": {

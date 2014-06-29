@@ -24,14 +24,31 @@
             }
         },
         "river": {
-            "description": "As you walk, you stumble across a small river. Despite it's size, you can see it's flowing quite rapidly and looks quite dangerous.",
+            "description": "As you walk, you stumble across a small river. Despite it's size, you can see it's flowing quite rapidly and looks quite dangerous. Looking around, you can also see an underground hatch. It looks like it's been closed for decades.",
             "exits": {
                 "east": {
                     "to": "clearing",
                     "description": "to the clearing"
+                },
+                "down": {
+                    "to": "hatch",
+                    "description": "into the hatch"
                 }
             },
             "objects": {}
+        },
+        "hatch": {
+            "instanced": true,
+            "description": "The entrance way to the hatch is dark and damp. It's hard to see what's around, but you can make out a couple of doorways - one to the west and one to the east.\r\n\r\nYou can just see the outline of a torch on the wall, though it isn't lit.",
+            "exits": {
+                "up": {
+                    "to": "river",
+                    "description": "through the hatch"
+                }
+            },
+            "objects": {
+                "torch": 1
+            }
         }
     },
     "objects": {
@@ -50,6 +67,10 @@
                 "break": "./objects.js:breakStick",
                 "throw": "./objects.js:throwStick"
             }
+        },
+        "torch": {
+            "unique": true,
+            "description": "A wooden torch. It's not lit. Perhaps you should light it."
         }
     },
     "characters": []
