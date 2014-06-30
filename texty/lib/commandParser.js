@@ -16,7 +16,7 @@ function () {
 	CommandParser.prototype.parseCommand = function (gameState, command, callback) {
 
 		var commandParts = command.split(' '),
-			world = ((this.textyObj.world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.party.world : this.textyObj.world),
+			world = ((this.textyObj.world.rooms[gameState.warehouse.position].instanced) ? gameState.world : this.textyObj.world),
 			commandList = this.assembleCommandList(world, gameState);
 
 		// Check each iteration of the comman and see if it matches anything in the command list

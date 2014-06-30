@@ -33,6 +33,7 @@ function (require, utils, commandParser, gameController, socialController) {
         // Create the player store
         self.players = {};
         self.parties = [];
+        self.worlds = [];
 
         if (config.auth) {
             self.auth = config.auth;
@@ -47,6 +48,7 @@ function (require, utils, commandParser, gameController, socialController) {
     Texty.prototype.initializeState = function (player, stateObj, template) {
         return {
             player: player,
+            state: 'room',
             template: template,
             roomHistory: [],
             warehouse: stateObj
@@ -59,6 +61,7 @@ function (require, utils, commandParser, gameController, socialController) {
         // NOTE: Perhaps not the most performant way of doing this?!
         return {
             player: player,
+            state: 'room',
             template: template,
             roomHistory: [],
             warehouse: JSON.parse(JSON.stringify(this.world.player))

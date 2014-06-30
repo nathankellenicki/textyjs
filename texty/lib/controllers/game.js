@@ -32,7 +32,7 @@ function (Mustache, gameView) {
             gameState.warehouse.position = room;
             gameState.roomHistory.push(roomObj);
             // Replace the world before displaying
-            world = ((this.textyObj.world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.party.world : this.textyObj.world);
+            world = ((this.textyObj.world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.world : this.textyObj.world);
             callback(this.view.displayRoom(world, gameState, room));
         } else {
             callback(Mustache.render(gameState.template.game.directions.instanced));

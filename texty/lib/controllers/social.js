@@ -78,21 +78,22 @@ function (Mustache, socialView, utils) {
 			// Is the fromPlayer already in a party? If not, create a party and instantiate the party world (PARTAYHOUSE!!!)
 			if (!gameState.party) {
 
-				var newParty = {
-					world: this.textyObj.instantiateWorld(),
-					players: {}
-				};
+				var players = {},
+					world = this.textyObj.instantiateWorld();
 
-				newParty.players[gameState.player] = gameState;
+				players[gameState.player] = gameState;
 
-				this.textyObj.parties.push(newParty);
-				gameState.party = newParty;
+				this.textyObj.parties.push(players);
+				this.textyObj.worlds.push(world);
+				gameState.party = players;
+				gameState.world = world;
 
 			}
 
 			// Add the toPlayer to the party (Which should now exist, regardless)
-			gameState.party.players[toPlayer] = this.textyObj.players[toPlayer];
+			gameState.party[toPlayer] = this.textyObj.players[toPlayer];
 			this.textyObj.players[toPlayer].party = gameState.party;
+			this.textyObj.players[toPlayer].world = gameState.world;
 			this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.players[toPlayer].template.social.party.addedby, {
 				fromPlayer: gameState.player
 			}));

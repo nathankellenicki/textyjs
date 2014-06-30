@@ -25,7 +25,7 @@ function (utils, Mustache) {
 	GameView.prototype.displayRoom = function (world, gameState, room) {
 
 		var msg = '';
-	    
+
 	    msg += Mustache.render(gameState.template.game.room, {
 	    	description: world.rooms[room].description
 	    });
