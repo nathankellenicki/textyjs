@@ -38,7 +38,7 @@ function (Mustache, socialView, utils) {
 
 	// Display all players in the vicinity (Different behaviour for public vs instanced room)
 	SocialController.prototype.displayLocalPlayers = function (world, gameState, callback) {
-		var players = ((world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.party.players : this.textyObj.players);
+		var players = ((world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.party : this.textyObj.players);
 		callback(this.view.displayLocalPlayers(world, gameState, players));
 	}
 
