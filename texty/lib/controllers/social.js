@@ -38,7 +38,7 @@ function (Mustache, socialView, utils) {
 
 	// Display all players in the vicinity (Different behaviour for public vs instanced room)
 	SocialController.prototype.displayLocalPlayers = function (world, gameState, callback) {
-		var players = ((world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.party.players : this.textyObj.players);
+		var players = ((world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.party : this.textyObj.players);
 		callback(this.view.displayLocalPlayers(world, gameState, players));
 	}
 
@@ -69,37 +69,141 @@ function (Mustache, socialView, utils) {
 			return;
 		}
 
+		// Player is in an instanced area
+		if (this.textyObj.players[toPlayer].world && this.textyObj.players[toPlayer].world.rooms[this.textyObj.players[toPlayer].warehouse.position].instanced) {
+			callback(Mustache.render(gameState.template.social.party.ininstance));
+			return;
+		}
+
 		// If toPlayer is already in a party, decline party invite.
 		if (!!this.textyObj.players[toPlayer].party) {
 			callback(Mustache.render(gameState.template.social.party.alreadyinparty));
 			return;
 		} else {
 			
-			// Is the fromPlayer already in a party? If not, create a party and instantiate the party world (PARTAYHOUSE!!!)
+			// Is the fromPlayer already in a party? If not, create a party and instantiate the party world if the user isn't in one (PARTAYHOUSE!!!)
 			if (!gameState.party) {
 
-				var players = {},
-					world = this.textyObj.instantiateWorld();
+				var players = {};
 
 				players[gameState.player] = gameState;
 
 				this.textyObj.parties.push(players);
-				this.textyObj.worlds.push(world);
+				if (!gameState.world) {
+					var world = this.textyObj.instantiateWorld();
+					this.textyObj.worlds.push(world);
+					gameState.world = world;
+				}
 				gameState.party = players;
-				gameState.world = world;
 
 			}
+
+			// Notify all players that you are joining the party
 
 			// Add the toPlayer to the party (Which should now exist, regardless)
 			gameState.party[toPlayer] = this.textyObj.players[toPlayer];
 			this.textyObj.players[toPlayer].party = gameState.party;
 			this.textyObj.players[toPlayer].world = gameState.world;
+
+			// Notify player they've been added
 			this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.players[toPlayer].template.social.party.addedby, {
 				fromPlayer: gameState.player
 			}));
-			callback(Mustache.render(gameState.template.social.party.successfullyadded, {
-				toPlayer: toPlayer
+
+			callback(Mustache.render(gameState.template.social.party.playerjoined, {
+				player: toPlayer
 			}));
+
+		}
+
+	}
+
+
+	// Drop party
+	SocialController.prototype.dropParty = function (gameState, callback) {
+
+		// If you're not in a party, fail
+		if (!gameState.party) {
+			callback(Mustache.render(gameState.template.social.party.notinparty));
+			return;
+		} else {
+
+			// Notify all players that you are leaving the party
+
+			// Remove the player from the players list of the party
+			delete gameState.party[gameState.player];
+
+			// If there is 1 or less people in the party after leaving, initiate the kickout process if necessary
+			if (Utils.numProperties(gameState.party) == 1) { // We don't need to check for 0
+
+				var lastPlayer = Utils.objectProperties(gameState.party)[0];
+
+				delete gameState.party[lastPlayer];
+				delete this.textyObj.players[lastPlayer].party; // This should free up the last reference?
+				this.sendInfo(gameState, lastPlayer, Mustache.render(this.textyObj.players[lastPlayer].template.social.party.partydisbanded));
+
+				if (this.textyObj.players[lastPlayer].world) {
+					// Remove the world if not in instanced area
+					if (!this.textyObj.players[lastPlayer].world.rooms[this.textyObj.players[lastPlayer].warehouse.position].instanced) {
+						delete this.textyObj.players[lastPlayer].world;
+					} else {
+						// Start a timer if they are
+						(function (gameState, self) {
+							gameState.partyTimer = Utils.setTimeout(function () {
+								self.kickFromInstance(gameState);
+							}, 10 * 1000);
+						})(this.textyObj.players[lastPlayer], this);
+					}
+				}
+
+			}
+
+			// Finally, drop the party
+			delete gameState.party;
+
+			if (gameState.world) {
+				// Remove the world if not in an instanced area
+				if (!gameState.world.rooms[gameState.warehouse.position].instanced) {
+					delete gameState.world;
+				} else {
+					// Start a timer if they are
+					(function (gameState, self) {
+						gameState.partyTimer = Utils.setTimeout(function () {
+							self.kickFromInstance(gameState);
+						}, 10 * 1000);
+					})(gameState, this);
+				}
+			}
+
+			callback(Mustache.render(gameState.template.social.party.partydropped));
+
+		}
+
+	}
+
+
+	// Kick out of room after leaving a party
+	SocialController.prototype.kickFromInstance = function (gameState) {
+
+		var self = this,
+			world = (gameState.world ? gameState.world : self.textyObj.world);
+
+		if (world.rooms[gameState.warehouse.position].instanced) {
+
+			var room = null;
+
+			// Select the last non instanced room
+			for (var i = gameState.roomHistory.length - 1; i >= 0; i--) {
+				if (!world.rooms[gameState.roomHistory[i]].instanced) {
+					room = gameState.roomHistory[i];
+					break;
+				}
+			}
+
+			if (room)
+			self.textyObj.controllers.game.switchRooms(world, gameState, room, function (msg) {
+				self.sendInfo(gameState, gameState.player, Mustache.render(gameState.template.social.party.kickedfrominstance + msg));
+			});
 
 		}
 

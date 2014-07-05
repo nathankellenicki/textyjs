@@ -25,15 +25,22 @@ function (Mustache, gameView) {
     // Switch rooms method
     GameController.prototype.switchRooms = function (world, gameState, room, callback) {
 
-        var roomObj = world.rooms[room];
-
-        // Check if this is an instanced room, and deny entry unless the user is in a party. (NOTE: Check that the social module is loaded before caring!)
-        if (!roomObj.instanced || (roomObj.instanced && gameState.party)) {
+        // Check if this is an instanced room, and deny entry unless the user is in a party, or unless the user is in an instanced room already. (NOTE: Check that the social module is loaded before caring!)
+        if (!world.rooms[room].instanced || (world.rooms[room].instanced && gameState.party) || (gameState.roomHistory > 0 && gameState.world.rooms[gameState.roomHistory[gameState.roomHistory.length - 1]].instanced)) {
             gameState.warehouse.position = room;
-            gameState.roomHistory.push(roomObj);
+            gameState.roomHistory.push(room);
             // Replace the world before displaying
             world = ((this.textyObj.world.rooms[gameState.warehouse.position].instanced && gameState.party) ? gameState.world : this.textyObj.world);
             callback(this.view.displayRoom(world, gameState, room));
+
+            // Clean up user by deleting their world if they are no longer in a party and it's not an instanced room
+            if (!world.rooms[room].instanced && !gameState.party) {
+                delete gameState.world;
+                if (gameState.partyTimer) {
+                    clearTimeout(gameState.partyTimer);
+                }
+            }
+
         } else {
             callback(Mustache.render(gameState.template.game.directions.instanced));
         }

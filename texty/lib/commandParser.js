@@ -102,6 +102,10 @@ function () {
 			self.textyObj.controllers.social.inviteToParty(gameState, options, callback);
 		}
 
+		commandList['party drop'] = function (world, gameState, options, callback) {
+			self.textyObj.controllers.social.dropParty(gameState, callback);
+		}
+
 		return commandList;
 
 	}
