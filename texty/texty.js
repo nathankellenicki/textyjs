@@ -33,7 +33,6 @@ function (require, utils, commandParser, gameController, socialController) {
         // Create the player store
         self.players = {};
         self.parties = [];
-        self.worlds = [];
 
         if (config.auth) {
             self.auth = config.auth;

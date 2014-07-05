@@ -91,7 +91,6 @@ function (Mustache, socialView, utils) {
 				this.textyObj.parties.push(players);
 				if (!gameState.world) {
 					var world = this.textyObj.instantiateWorld();
-					this.textyObj.worlds.push(world);
 					gameState.world = world;
 				}
 				gameState.party = players;
@@ -109,6 +108,11 @@ function (Mustache, socialView, utils) {
 			this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.players[toPlayer].template.social.party.addedby, {
 				fromPlayer: gameState.player
 			}));
+
+			// Clear your instance exit timer if there is one running
+			if (gameState.partyTimer) {
+				clearTimeout(gameState.partyTimer);
+			}
 
 			callback(Mustache.render(gameState.template.social.party.playerjoined, {
 				player: toPlayer
