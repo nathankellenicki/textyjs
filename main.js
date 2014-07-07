@@ -36,13 +36,14 @@ function (Texty, TCPConnection, RedisStore, fs) {
     });
 
     // Add listeners
-    tcp.on('connection', function (session, callback) {
+    tcp.on('connect', function (session, callback) {
         callback('Please enter your username:\r\n');
         return;
     });
 
     // Session store
-    var sessions = {};
+    var sessionsByUser = {},
+        sessionsById = {};
 
     tcp.on('command', function (session, command, callback) {
         
@@ -63,7 +64,8 @@ function (Texty, TCPConnection, RedisStore, fs) {
                         session.auth.authenticated = true;
                         session.auth.userId = res;
 
-                        sessions[session.auth.username] = session;
+                        sessionsByUser[session.auth.username] = session;
+                        sessionsById[session.sessionId] = session;
 
                         // Now that we're authenticated, attempt to load the game state from Redis
                         redis.load(session.auth.userId, function (err, res) {
@@ -115,13 +117,27 @@ function (Texty, TCPConnection, RedisStore, fs) {
         }
     });
 
+    tcp.on('disconnect', function (session) {
+        game.quit(sessionsById[session.sessionId].auth.username);
+        // Tidy up
+        delete sessionsByUser[sessionsById[session.sessionId].auth.username];
+        delete sessionsById[session.sessionId];
+    });
+
     game.on('gameEvent', function (gameState, data) {
-        if (sessions[gameState.player]) {
-            tcp.sendData(sessions[gameState.player].sessionId, data);
+        if (sessionsByUser[gameState.player]) {
+            tcp.sendData(sessionsByUser[gameState.player].sessionId, data);
             return true;
         } else {
             return false;
         }
+    });
+
+    game.on('quit', function (gameState) {
+        // Force tcp disconnect
+        tcp.endConnection(sessionsByUser[gameState.player].sessionId);
+        delete sessionsById[sessionsByUser[gameState.player].sessionId];
+        delete sessionsByUser[gameState.player];
     });
 
 });

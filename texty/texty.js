@@ -32,7 +32,6 @@ function (require, utils, commandParser, gameController, socialController) {
 
         // Create the player store
         self.players = {};
-        self.parties = [];
 
         if (config.auth) {
             self.auth = config.auth;
@@ -84,9 +83,28 @@ function (require, utils, commandParser, gameController, socialController) {
     }
 
 
-    // Starts the game
+    // Starts the game for a player
     Texty.prototype.start = function (initialState, callback) {
         this.players[initialState.player] = this.controllers.game.switchRooms(this.world, initialState, initialState.warehouse.position, callback);
+    }
+
+    // Quits the game for a player
+    Texty.prototype.quit = function (player, callback) {
+
+        var gameState = this.players[player];
+
+        if (callback) {
+            //this.controllers.game.goodbye(this.players[player], callback);
+        }
+
+        // Drop the party if the player is in one
+        this.controllers.social.dropParty(gameState, function (msg) {});
+
+        // Trigger the event (NOTE: Could cause a circular loop?)
+        this.triggerGameEvent('quit', gameState, null);
+
+        delete this.players[player];
+
     }
 
 
@@ -97,9 +115,9 @@ function (require, utils, commandParser, gameController, socialController) {
 
 
     // Internal event handler trigger
-    Texty.prototype.triggerGameEvent = function (gameState, data) {
-        if (this.eventHandlers['gameEvent']) {
-            return this.eventHandlers['gameEvent'](gameState, data);
+    Texty.prototype.triggerGameEvent = function (gameEvent, gameState, data) {
+        if (this.eventHandlers[gameEvent]) {
+            return this.eventHandlers[gameEvent](gameState, data);
         }
         return true;
     }

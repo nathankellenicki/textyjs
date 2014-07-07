@@ -29,7 +29,7 @@ function (net, util, events) {
             self.clients[socket.userData.sessionId] = socket;
 
             // Emit on a new connection
-            self.emit('connection', socket.userData, function (res) {
+            self.emit('connect', socket.userData, function (res) {
                 socket.write(res);
             });
 
@@ -54,7 +54,10 @@ function (net, util, events) {
 
             // Close client connections when they leave
             socket.on('end', function () {
-                self.clients.splice(self.clients.indexOf(socket), 1);
+                if (self.clients[socket.userData.sessionId]) {
+                    delete self.clients[socket.userData.sessionId];
+                    self.emit('disconnect', socket.userData);
+                }
             });
 
         }).listen(config.port);
@@ -70,6 +73,14 @@ function (net, util, events) {
     TCPConnection.prototype.sendData = function (sessionId, data) {
         if (this.clients[sessionId]) {
             this.clients[sessionId].write(data);
+        }
+    }
+
+    // Method for terminating a connection
+    TCPConnection.prototype.endConnection = function (sessionId) {
+        if (this.clients[sessionId]) {
+            this.clients[sessionId].end();
+            delete this.clients[sessionId];
         }
     }
 

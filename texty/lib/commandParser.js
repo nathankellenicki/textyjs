@@ -83,6 +83,10 @@ function () {
 			self.textyObj.controllers.game.dropItem(world, gameState, options, callback);
 		}
 
+		commandList['quit'] = function (world, gameState, options, callback) {
+			self.textyObj.quit(gameState.player, callback);
+		}
+
 		// Multiplayer and party implementation stuff goes here (NOTE: Perhaps this should be turned on/off depending on whether Texty is used client or server side)
 		// NOTE2: This should totally be in a multiplayerController.js file. Get it out of here.
 

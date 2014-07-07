@@ -22,7 +22,7 @@ function (Mustache, socialView, utils) {
 
 	// Send game info to a user
 	SocialController.prototype.sendInfo = function (gameState, toPlayer, message, callback) {
-		if (this.textyObj.triggerGameEvent(this.textyObj.players[toPlayer], message)) {
+		if (this.textyObj.triggerGameEvent('gameEvent', this.textyObj.players[toPlayer], message)) {
 			if (callback) {
 				callback(Mustache.render(gameState.template.social.messaging.sent));
 			}
@@ -88,7 +88,6 @@ function (Mustache, socialView, utils) {
 
 				players[gameState.player] = gameState;
 
-				this.textyObj.parties.push(players);
 				if (!gameState.world) {
 					var world = this.textyObj.instantiateWorld();
 					gameState.world = world;
