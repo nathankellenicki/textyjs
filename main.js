@@ -119,9 +119,6 @@ function (Texty, TCPConnection, RedisStore, fs) {
 
     tcp.on('disconnect', function (session) {
         game.quit(sessionsById[session.sessionId].auth.username);
-        // Tidy up
-        delete sessionsByUser[sessionsById[session.sessionId].auth.username];
-        delete sessionsById[session.sessionId];
     });
 
     game.on('gameEvent', function (gameState, data) {
