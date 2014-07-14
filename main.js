@@ -15,7 +15,7 @@ requirejs.config({
 requirejs(['Texty', 'TCPConnection', 'RedisStore', 'fs'],
 function (Texty, TCPConnection, RedisStore, fs) {
 
-    // Load the game module and template
+    // Load the game module and template (This should come in via RequireJS)
     var world = JSON.parse(fs.readFileSync(__dirname + '/stroll/world.json')),
         template = JSON.parse(fs.readFileSync(__dirname + '/texty/templates/ansiTelnet.json'));
 
