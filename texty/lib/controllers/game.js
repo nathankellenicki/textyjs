@@ -1,8 +1,12 @@
 define([
     'mustache',
-    'texty/lib/views/game'
+    'texty/lib/views/game',
+    'texty/lib/utils'
 ],
-function (Mustache, gameView) {
+function (Mustache, gameView, utils) {
+
+    // Load modules
+    var Utils = utils();
 
     // Create the constructor
     var GameController = function (textyObj) {
@@ -19,6 +23,12 @@ function (Mustache, gameView) {
     // Welcome method
     GameController.prototype.welcome = function (world, gameState) {
         return this.view.displayWelcome(world, gameState);
+    }
+
+
+    // Help method
+    GameController.prototype.commandList = function (gameState, commandList, callback) {
+        callback(this.view.displayCommandList(gameState, Utils.objectProperties(commandList)));
     }
 
 

@@ -21,6 +21,16 @@ function (utils, Mustache) {
 	}
 
 
+	// Format the command list
+	GameView.prototype.displayCommandList = function (gameState, commandList) {
+
+	    return Mustache.render(gameState.template.game.help, {
+	    	commands: commandList
+	    });
+
+	}
+
+
 	// Format room display
 	GameView.prototype.displayRoom = function (world, gameState, room) {
 

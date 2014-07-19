@@ -8,7 +8,7 @@ requirejs.config({
     paths: {
         Texty: 'texty/texty',
         TCPConnection: 'texty/lib/connections/tcp',
-        OrchestrateStore: 'texty/lib/auth/orchestrate'
+        OrchestrateStore: 'texty/lib/auth/redis'
     }
 });
 

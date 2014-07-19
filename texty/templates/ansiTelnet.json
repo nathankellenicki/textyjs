@@ -1,6 +1,7 @@
 {
 	"game": {
 		"welcome": "\r\n----------\r\n\r\n\u001b[1m{{& title}}\u001b[0m\r\n\r\n{{& greeting}}\r\n\r\nTo continue, press \u001b[1menter\u001b[0m",
+		"help": "Commands:\r\n{{#commands}}\u001b[1m{{.}}\r\n\u001b[0m{{/commands}}\r\n",
 		"room": "\r\n----------\r\n\r\n{{& description}}\r\n\r\n",
 		"directions": {
 			"exists": "Directions:\r\n{{#directions}}\u001b[1m{{& direction}}\u001b[0m {{& description}}\r\n{{/directions}}\r\n\r\n",
@@ -30,7 +31,8 @@
 		"messaging": {
 			"sent": "Message sent.\r\n\r\n",
 			"received": "Message from {{& fromPlayer}}: {{& message}}\r\n\r\n",
-			"notsent": "Could not send message to {{& toPlayer}}.\r\n\r\n"
+			"notsent": "Could not send message to {{& toPlayer}}.\r\n\r\n",
+			"playerdoesntexist": "Cannot find {{& toPlayer}}.\r\n\r\n"
 		},
 		"party": {
 			"cannotinviteself": "You cannot invite yourself to a party.\r\n\r\n",

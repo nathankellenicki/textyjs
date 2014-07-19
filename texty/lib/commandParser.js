@@ -110,6 +110,14 @@ function () {
 			self.textyObj.controllers.social.dropParty(gameState, callback);
 		}
 
+		commandList['party message'] = function (world, gameState, options, callback) {
+			self.textyObj.controllers.social.sendPartyMessage(gameState, options, callback);
+		}
+
+		commandList['help'] = function (world, gameState, options, callback) {
+			self.textyObj.controllers.game.commandList(gameState, commandList, callback);
+		}
+
 		return commandList;
 
 	}

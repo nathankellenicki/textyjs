@@ -45,10 +45,41 @@ function (Mustache, socialView, utils) {
 
 	// Send a message to a user
 	SocialController.prototype.sendMessage = function (gameState, toPlayer, message, callback) {
+		
+		// Player doesn't exist
+		if (!this.textyObj.players[toPlayer]) {
+			callback(Mustache.render(gameState.template.social.messaging.playerdoesntexist, {
+				toPlayer: toPlayer
+			}));
+			return;
+		}
+
 		this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.players[toPlayer].template.social.messaging.received, {
             fromPlayer: gameState.player,
             message: message
         }), callback);
+
+	}
+
+
+	// Send a message to a party
+	SocialController.prototype.sendPartyMessage = function (gameState, message, callback) {
+
+		if (!gameState.party) {
+			// You are not in a party
+			callback(Mustache.render(gameState.template.social.party.notinparty));
+			return;
+		}
+
+		// Send message to all
+		for (var player in gameState.party) {
+			if (gameState.player != player) {
+				this.sendMessage(gameState, player, message);
+			}
+		}
+
+		callback(Mustache.render(gameState.template.social.messaging.sent));
+
 	}
 
 
