@@ -8,12 +8,12 @@ requirejs.config({
     paths: {
         Texty: 'texty/texty',
         TCPConnection: 'texty/lib/connections/tcp',
-        RedisStore: 'texty/lib/auth/redis'
+        OrchestrateStore: 'texty/lib/auth/orchestrate'
     }
 });
 
-requirejs(['Texty', 'TCPConnection', 'RedisStore', 'fs'],
-function (Texty, TCPConnection, RedisStore, fs) {
+requirejs(['Texty', 'TCPConnection', 'OrchestrateStore', 'fs'],
+function (Texty, TCPConnection, OrchestrateStore, fs) {
 
     // Load the game module and template (This should come in via RequireJS)
     var world = JSON.parse(fs.readFileSync(__dirname + '/stroll/world.json')),
@@ -26,13 +26,12 @@ function (Texty, TCPConnection, RedisStore, fs) {
 
     // Initialize the TCP connection
     var tcp = new TCPConnection(game, {
-        port: 10070
+        port: process.env.PORT || 10070
     });
 
-    // Initialize the connection to Redis
-    var redis = new RedisStore({
-        host: 'localhost',
-        port: 6379
+    // Initialize the connection to Orchestrate
+    var db = new OrchestrateStore({
+        token: 'f57a7ecb-b0a6-4ae6-913f-84b9b1c25905'
     });
 
     // Add listeners
@@ -56,8 +55,8 @@ function (Texty, TCPConnection, RedisStore, fs) {
                 callback('Please enter your password:\r\n');
             } else if (!session.auth.authenticated) {
 
-                // Authenticate against Redis (I should really check for success/failure)
-                redis.auth(session.auth.username, command, function (err, res) {
+                // Authenticate against the db (I should really check for success/failure)
+                db.auth(session.auth.username, command, function (err, res) {
 
                     if (!err && res) {
 
@@ -68,7 +67,7 @@ function (Texty, TCPConnection, RedisStore, fs) {
                         sessionsById[session.sessionId] = session;
 
                         // Now that we're authenticated, attempt to load the game state from Redis
-                        redis.load(session.auth.userId, function (err, res) {
+                        db.load(session.auth.userId, function (err, res) {
 
                             if (!err) {
                                 // Convert the loaded user state object into a compatible game state

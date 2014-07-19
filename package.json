@@ -8,9 +8,9 @@
 		"test": "mocha"
 	},
 	"dependencies": {
-		"mocha": "1.20.x",
 		"requirejs": "2.1.x",
-		"mustache": "0.8.x"
+		"mustache": "0.8.x",
+		"orchestrate": "0.2.x"
 	},
 	"engines": {
 		"node": ">=0.10.24"
