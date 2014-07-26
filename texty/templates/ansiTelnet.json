@@ -40,11 +40,15 @@
 			"alreadyinparty": "Player is already in a party.\r\n\r\n",
 			"notinparty": "You are not in a party.\r\n\r\n",
 			"ininstance": "You cannot invite a player located in an instanced area.\r\n\r\n",
-			"addedby": "You were added to a party by {{& fromPlayer}}.\r\n\r\n",
 			"playerjoined": "{{& player}} joined the party.\r\n\r\n",
 			"playerleft": "{{& player}} left the party.\r\n\r\n",
 			"partydropped": "You have left the party.\r\n\r\n",
 			"partydisbanded": "Your party was disbanded.\r\n\r\n",
+			"invitereceived": "You were invited to a party by {{& fromPlayer}}, do you want to join? (yes/no)\r\n",
+			"invitesent": "Party invite sent to {{& toPlayer}}.\r\n\r\n",
+			"inviteaccepted": "Joined party.\r\n\r\n",
+			"invitedeclined": "Party invite declined.\r\n\r\n",
+			"pendinginvite": "This player already has a pending invite.\r\n\r\n",
 			"kickedfrominstance": "Being alone in there got to you after a while. You retreat back to the last safe place you were at.\r\n\r"
 		},
 		"area": {

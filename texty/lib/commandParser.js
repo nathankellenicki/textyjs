@@ -46,76 +46,97 @@ function () {
 	CommandParser.prototype.assembleCommandList = function (world, gameState) {
 
 		var self = this,
+			Texty = self.textyObj,
 			commandList = {},
 			currentRoom = world.rooms[gameState.warehouse.position];
 
-		commandList['inventory'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.game.displayInventory(world, gameState, callback);
-		}
+		switch(gameState.state.type) {
 
-		commandList['items'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.game.displayItems(world, gameState, gameState.warehouse.position, callback);
-		}
+			case Texty.PlayerState.PARTY_INVITE:
 
-		commandList['directions'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.game.displayDirections(world, gameState, gameState.warehouse.position, callback);
-		}
-
-		// Add directions to command list
-		for (var direction in currentRoom.exits) {
-			(function (direction) {
-				commandList[direction] = function (world, gameState, options, callback) {
-					self.textyObj.controllers.game.switchRooms(world, gameState, currentRoom.exits[direction].to, callback);
+				commandList['yes'] = commandList['y'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.social.acceptPartyInvite(gameState, callback);
 				}
-			})(direction);
-		}
 
-		// Add items from immediate area to command list
-		commandList['look at'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.game.lookAtItem(world, gameState, options, callback);
-		}
+				commandList['no'] = commandList['n'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.social.declinePartyInvite(gameState, callback);
+				}
 
-		commandList['pick up'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.game.pickUpItem(world, gameState, options, callback);
-		}
+				break;
 
-		commandList['drop'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.game.dropItem(world, gameState, options, callback);
-		}
+			default: // Texty.PlayerState.ROOM
 
-		commandList['quit'] = function (world, gameState, options, callback) {
-			self.textyObj.quit(gameState.player, callback);
-		}
+				commandList['inventory'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.displayInventory(world, gameState, callback);
+				}
 
-		// Multiplayer and party implementation stuff goes here (NOTE: Perhaps this should be turned on/off depending on whether Texty is used client or server side)
-		// NOTE2: This should totally be in a multiplayerController.js file. Get it out of here.
+				commandList['items'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.displayItems(world, gameState, gameState.warehouse.position, callback);
+				}
 
-		commandList['players'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.social.displayLocalPlayers(world, gameState, callback);
-		}
+				commandList['directions'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.displayDirections(world, gameState, gameState.warehouse.position, callback);
+				}
 
-		commandList['message'] = function (world, gameState, options, callback) {
-			if (options.split(' ').length >= 2) {
-				self.textyObj.controllers.social.sendMessage(gameState, options.split(' ', 2)[0], options.slice(options.indexOf(' ') + 1), callback);
-			} else {
-				callback('Could not send message.\r\n\r\n');
-			}
-		}
+				// Add directions to command list
+				for (var direction in currentRoom.exits) {
+					(function (direction) {
+						commandList[direction] = function (world, gameState, options, callback) {
+							self.textyObj.controllers.game.switchRooms(world, gameState, currentRoom.exits[direction].to, callback);
+						}
+					})(direction);
+				}
 
-		commandList['party invite'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.social.inviteToParty(gameState, options, callback);
-		}
+				// Add items from immediate area to command list
+				commandList['look at'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.lookAtItem(world, gameState, options, callback);
+				}
 
-		commandList['party drop'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.social.dropParty(gameState, callback);
-		}
+				commandList['pick up'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.pickUpItem(world, gameState, options, callback);
+				}
 
-		commandList['party message'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.social.sendPartyMessage(gameState, options, callback);
-		}
+				commandList['drop'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.dropItem(world, gameState, options, callback);
+				}
 
-		commandList['help'] = function (world, gameState, options, callback) {
-			self.textyObj.controllers.game.commandList(gameState, commandList, callback);
+				commandList['quit'] = function (world, gameState, options, callback) {
+					self.textyObj.quit(gameState.player, callback);
+				}
+
+				// Multiplayer and party implementation stuff goes here (NOTE: Perhaps this should be turned on/off depending on whether Texty is used client or server side)
+				// NOTE2: This should totally be in a multiplayerController.js file. Get it out of here.
+
+				commandList['players'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.social.displayLocalPlayers(world, gameState, callback);
+				}
+
+				commandList['message'] = function (world, gameState, options, callback) {
+					if (options.split(' ').length >= 2) {
+						self.textyObj.controllers.social.sendMessage(gameState, options.split(' ', 2)[0], options.slice(options.indexOf(' ') + 1), callback);
+					} else {
+						callback('Could not send message.\r\n\r\n');
+					}
+				}
+
+				commandList['party invite'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.social.inviteToParty(gameState, options, callback);
+				}
+
+				commandList['party drop'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.social.dropParty(gameState, callback);
+				}
+
+				commandList['party message'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.social.sendPartyMessage(gameState, options, callback);
+				}
+
+				commandList['help'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.commandList(gameState, commandList, callback);
+				}
+
+				break;
+
 		}
 
 		return commandList;

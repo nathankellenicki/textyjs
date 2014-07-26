@@ -42,11 +42,21 @@ function (require, utils, commandParser, gameController, socialController) {
 
     }
 
+    
+    // Define player state constants
+    Texty.prototype.PlayerState = {
+        'ROOM': 0,
+        'PARTY_INVITE': 1
+    }
+
+
     // Convert a datastore object to a game object
     Texty.prototype.initializeState = function (player, stateObj, template) {
         return {
             player: player,
-            state: 'room',
+            state: {
+                type: this.PlayerState.ROOM
+            },
             template: template,
             roomHistory: [],
             warehouse: stateObj
@@ -59,7 +69,9 @@ function (require, utils, commandParser, gameController, socialController) {
         // NOTE: Perhaps not the most performant way of doing this?!
         return {
             player: player,
-            state: 'room',
+            state: {
+                type: this.PlayerState.ROOM
+            },
             template: template,
             roomHistory: [],
             warehouse: JSON.parse(JSON.stringify(this.world.player))

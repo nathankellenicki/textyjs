@@ -86,6 +86,8 @@ function (Mustache, socialView, utils) {
 	// Invite a user to a party
 	SocialController.prototype.inviteToParty = function (gameState, toPlayer, callback) {
 
+		var Texty = this.textyObj;
+
 		// It's yourself stupid!
 		if (gameState.player == toPlayer) {
 			callback(Mustache.render(gameState.template.social.party.cannotinviteself));
@@ -100,6 +102,12 @@ function (Mustache, socialView, utils) {
 			return;
 		}
 
+		// Player already has a pending party invite
+		if (this.textyObj.players[toPlayer].state.type == Texty.PlayerState.PARTY_INVITE) {
+			callback(Mustache.render(gameState.template.social.party.pendinginvite));
+			return;
+		}
+
 		// Player is in an instanced area
 		if (this.textyObj.players[toPlayer].world && this.textyObj.players[toPlayer].world.rooms[this.textyObj.players[toPlayer].warehouse.position].instanced) {
 			callback(Mustache.render(gameState.template.social.party.ininstance));
@@ -111,44 +119,100 @@ function (Mustache, socialView, utils) {
 			callback(Mustache.render(gameState.template.social.party.alreadyinparty));
 			return;
 		} else {
-			
-			// Is the fromPlayer already in a party? If not, create a party and instantiate the party world if the user isn't in one (PARTAYHOUSE!!!)
-			if (!gameState.party) {
 
-				var players = {};
-
-				players[gameState.player] = gameState;
-
-				if (!gameState.world) {
-					var world = this.textyObj.instantiateWorld();
-					gameState.world = world;
-				}
-				gameState.party = players;
-
+			this.textyObj.players[toPlayer].state = {
+				type: Texty.PlayerState.PARTY_INVITE,
+				fromPlayer: gameState.player
 			}
 
-			// Notify all players that you are joining the party
-
-			// Add the toPlayer to the party (Which should now exist, regardless)
-			gameState.party[toPlayer] = this.textyObj.players[toPlayer];
-			this.textyObj.players[toPlayer].party = gameState.party;
-			this.textyObj.players[toPlayer].world = gameState.world;
-
-			// Notify player they've been added
-			this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.players[toPlayer].template.social.party.addedby, {
+			this.sendInfo(gameState, toPlayer, Mustache.render(this.textyObj.players[toPlayer].template.social.party.invitereceived, {
 				fromPlayer: gameState.player
 			}));
 
-			// Clear your instance exit timer if there is one running
-			if (gameState.partyTimer) {
-				clearTimeout(gameState.partyTimer);
-			}
-
-			callback(Mustache.render(gameState.template.social.party.playerjoined, {
-				player: toPlayer
+			callback(Mustache.render(gameState.template.social.party.invitesent, {
+				toPlayer: toPlayer
 			}));
 
 		}
+
+	}
+
+
+	// Decline party invite
+	SocialController.prototype.declinePartyInvite = function (gameState, callback) {
+
+		var Texty = this.textyObj;
+
+		gameState.state = {
+			type: Texty.PlayerState.ROOM
+		}
+
+		callback(Mustache.render(gameState.template.social.party.invitedeclined));
+
+	}
+
+
+	// Accept party invite
+	SocialController.prototype.acceptPartyInvite = function (gameState, callback) {
+
+		var Texty = this.textyObj;
+
+		// Player doesn't exist!
+		if (!this.textyObj.players[gameState.state.fromPlayer]) {
+			callback(Mustache.render(gameState.template.social.party.playerdoesntexist, {
+				toPlayer: gameState.state.fromPlayer
+			}));
+			return;
+		}
+			
+		var fromPlayerGameState = this.textyObj.players[gameState.state.fromPlayer];
+
+		// Is the fromPlayer already in a party? If not, create a party and instantiate the party world if the user isn't in one (PARTAYHOUSE!!!)
+		if (!fromPlayerGameState.party) {
+
+			var players = {};
+
+			players[gameState.state.fromPlayer] = fromPlayerGameState;
+
+			if (!fromPlayerGameState.world) {
+				var world = this.textyObj.instantiateWorld();
+				fromPlayerGameState.world = world;
+			}
+			fromPlayerGameState.party = players;
+
+		}
+
+		// Add the toPlayer to the party (Which should now exist, regardless)
+		gameState.party = fromPlayerGameState.party;
+		gameState.world = fromPlayerGameState.world;
+		gameState.party[gameState.player] = gameState;
+
+		// Notify all players that you are joining the party
+		for (var player in gameState.party) {
+			if (player != gameState.player) {
+				this.sendInfo(gameState, player, Mustache.render(this.textyObj.players[player].template.social.party.playerjoined, {
+					player: gameState.player
+				}))
+			}
+		}
+
+		// Notify player they've been added
+		callback(Mustache.render(gameState.template.social.party.inviteaccepted));
+
+		// Clear your instance exit timer if there is one running
+		if (fromPlayerGameState.partyTimer) {
+			clearTimeout(fromPlayerGameState.partyTimer);
+		}
+
+		// Put player back in ROOM state
+		gameState.state = {
+			type: Texty.PlayerState.ROOM
+		}
+
+		// Notify all other party members that you joined
+		//callback(Mustache.render(gameState.template.social.party.playerjoined, {
+		//	player: toPlayer
+		//}));
 
 	}
 
@@ -163,6 +227,13 @@ function (Mustache, socialView, utils) {
 		} else {
 
 			// Notify all players that you are leaving the party
+			for (var player in gameState.party) {
+				if (player != gameState.player) {
+					this.sendInfo(gameState, player, Mustache.render(this.textyObj.players[player].template.social.party.playerleft, {
+						player: gameState.player
+					}))
+				}
+			}
 
 			// Remove the player from the players list of the party
 			delete gameState.party[gameState.player];
