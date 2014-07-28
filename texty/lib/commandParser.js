@@ -15,6 +15,8 @@ function () {
 	// Command parser method
 	CommandParser.prototype.parseCommand = function (gameState, command, callback) {
 
+		console.log(gameState.player + ' - "' + command + '"');
+
 		var commandParts = command.split(' '),
 			world = ((this.textyObj.world.rooms[gameState.warehouse.position].instanced) ? gameState.world : this.textyObj.world),
 			commandList = this.assembleCommandList(world, gameState);
