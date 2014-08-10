@@ -110,7 +110,7 @@ function (require, utils, commandParser, gameController, socialController) {
         }
 
         // Drop the party if the player is in one
-        this.controllers.social.dropParty(gameState, function (msg) {});
+        this.controllers.social.dropParty(gameState);
 
         // Trigger the event (NOTE: Could cause a circular loop?)
         this.triggerGameEvent('quit', gameState, null);

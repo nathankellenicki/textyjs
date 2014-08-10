@@ -221,8 +221,10 @@ function (Mustache, socialView, utils) {
 	SocialController.prototype.dropParty = function (gameState, callback) {
 
 		// If you're not in a party, fail
-		if (!gameState.party) {
-			callback(Mustache.render(gameState.template.social.party.notinparty));
+		if (!gameState || !gameState.party) {
+			if (callback) {
+				callback(Mustache.render(gameState.template.social.party.notinparty));
+			}
 			return;
 		} else {
 

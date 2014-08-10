@@ -70,21 +70,16 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
                         session.auth.authenticated = true;
                         session.auth.userId = res;
 
-                        sessionsByUser[session.auth.username] = session;
-                        sessionsById[session.sessionId] = session;
-
                         // Now that we're authenticated, attempt to load the game state from Redis
                         db.load(session.auth.userId, function (err, res) {
 
                             if (!err) {
                                 // Convert the loaded user state object into a compatible game state
                                 session.gameState = game.initializeState(session.auth.userId, res, template);
-                                console.log('Game state loaded for user id ' + session.auth.userId);
                                 callback(game.displayWelcome(session.gameState));
                             } else {
                                 // Create a new user game state object
                                 session.gameState = game.createNewState(session.auth.userId, template);
-                                console.log('Game state created from scratch for user id ' + session.auth.userId);
                                 callback(game.displayWelcome(session.gameState));
                             }
 
@@ -94,7 +89,6 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
 
                         // Username and password not found
                         delete session.auth.username;
-                        console.log('User id not found');
                         callback('\r\nAuthentication failed. Please enter your username:\r\n');
 
                     }
@@ -108,6 +102,8 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
                 // Begin the game and show the players last state
                 session.auth.started = true;
                 game.start(session.gameState, function (data) {
+                    sessionsByUser[session.auth.username] = session;
+                    sessionsById[session.sessionId] = session;
                     callback(data);
                 });
                 return;
@@ -126,9 +122,12 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
 
     // Handle a user disconnect
     tcp.on('disconnect', function (session) {
-        game.quit(sessionsById[session.sessionId].auth.username);
+        // If this isn't set, they were never properly in the game
+        if (sessionsById[session.sessionId]) {
+            game.quit(sessionsById[session.sessionId].auth.username);
+        }
     });
-    
+
 
     // Handle game triggered events where a user needs notified
     game.on('gameEvent', function (gameState, data) {
@@ -144,9 +143,11 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
     // Handle a user quitting the game
     game.on('quit', function (gameState) {
         // Force tcp disconnect
-        tcp.endConnection(sessionsByUser[gameState.player].sessionId);
-        delete sessionsById[sessionsByUser[gameState.player].sessionId];
-        delete sessionsByUser[gameState.player];
+        if (gameState) {
+            tcp.endConnection(sessionsByUser[gameState.player].sessionId);
+            delete sessionsById[sessionsByUser[gameState.player].sessionId];
+            delete sessionsByUser[gameState.player];
+        }
     });
 
 });
