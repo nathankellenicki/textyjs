@@ -8,7 +8,7 @@ requirejs.config({
     paths: {
         Texty: 'texty/texty',
         TCPConnection: 'texty/lib/connections/tcp',
-        OrchestrateStore: 'texty/lib/auth/redis'
+        OrchestrateStore: 'texty/lib/auth/orchestrate'
     }
 });
 
@@ -50,9 +50,16 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
 
         // Authentication logic
         if (!session.auth.authenticated) {
-            if (!session.auth.username) {
-                session.auth.username = command;
-                callback('Please enter your password:\r\n');
+            if (!session.auth.username || session.auth.username == '') {
+
+                // Check if the entered username was blank
+                if (command != '') {
+                    session.auth.username = command;
+                    callback('\r\nPlease enter your password:\r\n');
+                } else {
+                    callback('Invalid username. Please enter your username:\r\n');
+                }
+
             } else if (!session.auth.authenticated) {
 
                 // Authenticate against the db (I should really check for success/failure)
@@ -88,7 +95,7 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
                         // Username and password not found
                         delete session.auth.username;
                         console.log('User id not found');
-                        callback('User not found, please try again.');
+                        callback('\r\nAuthentication failed. Please enter your username:\r\n');
 
                     }
 
@@ -116,10 +123,14 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
         }
     });
 
+
+    // Handle a user disconnect
     tcp.on('disconnect', function (session) {
         game.quit(sessionsById[session.sessionId].auth.username);
     });
+    
 
+    // Handle game triggered events where a user needs notified
     game.on('gameEvent', function (gameState, data) {
         if (sessionsByUser[gameState.player]) {
             tcp.sendData(sessionsByUser[gameState.player].sessionId, data);
@@ -129,6 +140,8 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
         }
     });
 
+
+    // Handle a user quitting the game
     game.on('quit', function (gameState) {
         // Force tcp disconnect
         tcp.endConnection(sessionsByUser[gameState.player].sessionId);
