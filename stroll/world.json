@@ -57,15 +57,18 @@
             "attainable": false,
             "description": "A small campfire.",
             "commands": {
-                "extinguish": "./objects.js:extinguishCampfire"
+                "extinguish": {
+                    "execoutsideinventory": true,
+                    "action": "campfire::extinguishCampfire"
+                }
             }
         },
         "stick": {
             "unique": true,
             "description": "A stick that's clearly broken off a tree.",
             "commands": {
-                "break": "./objects.js:breakStick",
-                "throw": "./objects.js:throwStick"
+                "break": "stick::breakStick",
+                "throw": "stick::throwStick"
             }
         },
         "torch": {

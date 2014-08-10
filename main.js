@@ -6,14 +6,18 @@ var requirejs = require('requirejs');
 requirejs.config({
     nodeRequire: require,
     paths: {
+        // Load Texty and connection modules
         Texty: 'texty/texty',
         TCPConnection: 'texty/lib/connections/tcp',
-        OrchestrateStore: 'texty/lib/auth/orchestrate'
+        OrchestrateStore: 'texty/lib/auth/orchestrate',
+
+        // Load the object action files (And the world and templates, but need to figure out a way to make it work)
+        CampfireActions: 'stroll/campfire'
     }
 });
 
-requirejs(['Texty', 'TCPConnection', 'OrchestrateStore', 'fs'],
-function (Texty, TCPConnection, OrchestrateStore, fs) {
+requirejs(['Texty', 'TCPConnection', 'OrchestrateStore', 'fs', 'CampfireActions'],
+function (Texty, TCPConnection, OrchestrateStore, fs, campfireActions) {
 
     // Load the game module and template (This should come in via RequireJS)
     var world = JSON.parse(fs.readFileSync(__dirname + '/stroll/world.json')),
@@ -21,7 +25,11 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
 
     // Initialize the Texty module with the game
     var game = new Texty({
-        world: world
+        world: world,
+        actions: {
+            'campfire': campfireActions,
+            'stick': null
+        }
     });
 
     // Initialize the TCP connection

@@ -137,6 +137,8 @@ function () {
 					self.textyObj.controllers.game.commandList(gameState, commandList, callback);
 				}
 
+				// Load up command list for object actions for items in the room and items in your inventory
+
 				break;
 
 		}
