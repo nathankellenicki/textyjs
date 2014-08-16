@@ -1,5 +1,10 @@
-define([],
-function () {
+define([
+	'texty/lib/utils'
+],
+function (utils) {
+
+	// Load modules
+    var Utils = utils();
 
 	// Create the constructor
 	var CommandParser = function (textyObj) {
@@ -138,6 +143,23 @@ function () {
 				}
 
 				// Load up command list for object actions for items in the room and items in your inventory
+				for (var object in currentRoom.objects) {
+					if (currentRoom.objects[object] >= 1 && world.objects[object].commands && Utils.numProperties(world.objects[object].commands) >= 1) {
+						for (var action in world.objects[object].commands) {
+
+							var actionObj = world.objects[object].commands[action];
+
+							if (actionObj.holding != 'undefined' && !actionObj.holding) {
+								(function (action, actionObj, object) {
+									commandList[action + ' ' + object] = function (world, gameState, options, callback) {
+										self.textyObj.objectModules[actionObj.module][actionObj.method](callback);
+									}
+								})(action, actionObj, object);
+							}
+
+						}
+					}
+				}
 
 				break;
 

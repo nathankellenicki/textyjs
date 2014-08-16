@@ -9,7 +9,7 @@ requirejs.config({
         // Load Texty and connection modules
         Texty: 'texty/texty',
         TCPConnection: 'texty/lib/connections/tcp',
-        OrchestrateStore: 'texty/lib/auth/orchestrate',
+        OrchestrateStore: 'texty/lib/auth/redis',
 
         // Load the object action files (And the world and templates, but need to figure out a way to make it work)
         CampfireActions: 'stroll/campfire'

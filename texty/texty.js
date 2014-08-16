@@ -26,6 +26,8 @@ function (require, utils, commandParser, gameController, socialController) {
             social: socialController(self)
         };
 
+        self.objectModules = config.actions;
+
         // Start the world
         self.worldTemplate = config.world;
         self.world = self.instantiateWorld();
@@ -46,7 +48,8 @@ function (require, utils, commandParser, gameController, socialController) {
     // Define player state constants
     Texty.prototype.PlayerState = {
         'ROOM': 0,
-        'PARTY_INVITE': 1
+        'PARTY_INVITE': 1,
+        'NPC_CONVERSATION': 2
     }
 
 

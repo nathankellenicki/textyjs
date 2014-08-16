@@ -58,8 +58,9 @@
             "description": "A small campfire.",
             "commands": {
                 "extinguish": {
-                    "execoutsideinventory": true,
-                    "action": "campfire::extinguishCampfire"
+                    "holding": false,
+                    "module": "campfire",
+                    "method": "extinguishCampfire"
                 }
             }
         },
@@ -67,8 +68,16 @@
             "unique": true,
             "description": "A stick that's clearly broken off a tree.",
             "commands": {
-                "break": "stick::breakStick",
-                "throw": "stick::throwStick"
+                "break": {
+                    "holding": true,
+                    "module": "stick",
+                    "method": "breakStick"
+                },
+                "throw": {
+                    "holding": true,
+                    "module": "stick",
+                    "method": "throwStick"
+                }
             }
         },
         "torch": {
