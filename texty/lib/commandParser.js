@@ -142,14 +142,33 @@ function (utils) {
 					self.textyObj.controllers.game.commandList(gameState, commandList, callback);
 				}
 
-				// Load up command list for object actions for items in the room and items in your inventory
+				// Add object actions from the immediate area to the command list
 				for (var object in currentRoom.objects) {
 					if (currentRoom.objects[object] >= 1 && world.objects[object].commands && Utils.numProperties(world.objects[object].commands) >= 1) {
 						for (var action in world.objects[object].commands) {
 
 							var actionObj = world.objects[object].commands[action];
 
-							if (actionObj.holding != 'undefined' && !actionObj.holding) {
+							if ((actionObj.holding != 'undefined' && !actionObj.holding) || !actionObj.holding) {
+								(function (action, actionObj, object) {
+									commandList[action + ' ' + object] = function (world, gameState, options, callback) {
+										self.textyObj.objectModules[actionObj.module][actionObj.method](callback);
+									}
+								})(action, actionObj, object);
+							}
+
+						}
+					}
+				}
+
+				// Add object actions from your inventory to the command list
+				for (var object in gameState.warehouse.inventory) {
+					if (gameState.warehouse.inventory[object] >= 1 && world.objects[object].commands && Utils.numProperties(world.objects[object].commands) >= 1) {
+						for (var action in world.objects[object].commands) {
+
+							var actionObj = world.objects[object].commands[action];
+
+							if ((actionObj.dropped != 'undefined' && !actionObj.dropped) || !actionObj.dropped) { // If this ability can be activated while holding it
 								(function (action, actionObj, object) {
 									commandList[action + ' ' + object] = function (world, gameState, options, callback) {
 										self.textyObj.objectModules[actionObj.module][actionObj.method](callback);
