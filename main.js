@@ -12,12 +12,13 @@ requirejs.config({
         OrchestrateStore: 'texty/lib/auth/redis',
 
         // Load the object action files (And the world and templates, but need to figure out a way to make it work)
-        CampfireActions: 'stroll/campfire'
+        CampfireActions: 'stroll/campfire',
+        StickActions: 'stroll/stick'
     }
 });
 
-requirejs(['Texty', 'TCPConnection', 'OrchestrateStore', 'fs', 'CampfireActions'],
-function (Texty, TCPConnection, OrchestrateStore, fs, campfireActions) {
+requirejs(['Texty', 'TCPConnection', 'OrchestrateStore', 'fs', 'CampfireActions', 'StickActions'],
+function (Texty, TCPConnection, OrchestrateStore, fs, campfireActions, stickActions) {
 
     // Load the game module and template (This should come in via RequireJS)
     var world = JSON.parse(fs.readFileSync(__dirname + '/stroll/world.json')),
@@ -28,7 +29,7 @@ function (Texty, TCPConnection, OrchestrateStore, fs, campfireActions) {
         world: world,
         actions: {
             'campfire': campfireActions,
-            'stick': null
+            'stick': stickActions
         }
     });
 

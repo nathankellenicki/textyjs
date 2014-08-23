@@ -55,17 +55,19 @@
         "campfire": {
             "unique": true,
             "attainable": false,
-            "description": "A small campfire.",
+            "description": "A small campfire, roaring away.",
             "commands": {
                 "extinguish": {
                     "holding": false,
                     "module": "campfire",
                     "method": "extinguishCampfire"
                 }
+            },
+            "attributes": {
+                "lit": true
             }
         },
         "stick": {
-            "unique": true,
             "description": "A stick that's clearly broken off a tree.",
             "commands": {
                 "break": {
@@ -79,6 +81,9 @@
                     "method": "throwStick"
                 }
             }
+        },
+        "broken_stick": {
+            "description": "A broken piece of stick. It looks like it was once part of a larger stick."
         },
         "torch": {
             "unique": true,

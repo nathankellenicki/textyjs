@@ -152,7 +152,7 @@ function (utils) {
 							if ((actionObj.holding != 'undefined' && !actionObj.holding) || !actionObj.holding) {
 								(function (action, actionObj, object) {
 									commandList[action + ' ' + object] = function (world, gameState, options, callback) {
-										self.textyObj.objectModules[actionObj.module][actionObj.method](callback);
+										self.textyObj.objectModules[actionObj.module][actionObj.method](self.textyObj.controllers.interface, callback);
 									}
 								})(action, actionObj, object);
 							}
@@ -171,7 +171,7 @@ function (utils) {
 							if ((actionObj.dropped != 'undefined' && !actionObj.dropped) || !actionObj.dropped) { // If this ability can be activated while holding it
 								(function (action, actionObj, object) {
 									commandList[action + ' ' + object] = function (world, gameState, options, callback) {
-										self.textyObj.objectModules[actionObj.module][actionObj.method](callback);
+										self.textyObj.objectModules[actionObj.module][actionObj.method](self.textyObj.controllers.interface, callback);
 									}
 								})(action, actionObj, object);
 							}

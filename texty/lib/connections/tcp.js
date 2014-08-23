@@ -42,7 +42,9 @@ function (net, util, events) {
                 
                 if (dataBuffer.indexOf('\r') >= 0) {
 
-                    self.emit('command', socket.userData, dataBuffer.replace(/(\r\n|\n|\r)/gm, ''), function (res) {
+                    dataBuffer = dataBuffer.replace(/[^\w\s]/gi, '').replace(/(\r\n|\n|\r)/gm, '').trim();
+
+                    self.emit('command', socket.userData, dataBuffer, function (res) {
                         socket.write(res);
                     });
 

@@ -5,8 +5,9 @@ define([
     'texty/lib/commandParser',
     'texty/lib/controllers/game',
     'texty/lib/controllers/social',
+    'texty/lib/controllers/interface/interface'
 ],
-function (require, utils, commandParser, gameController, socialController) {
+function (require, utils, commandParser, gameController, socialController, interfaceController) {
 
     // Create the constructor
     var Texty = function (config) {
@@ -23,7 +24,8 @@ function (require, utils, commandParser, gameController, socialController) {
 
         self.controllers = {
             game: gameController(self),
-            social: socialController(self)
+            social: socialController(self),
+            interface: interfaceController(self)
         };
 
         self.objectModules = config.actions;
