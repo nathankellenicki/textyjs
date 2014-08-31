@@ -13,26 +13,34 @@ function (
     var Utils = utils();
 
     // Create the constructor
-    var InterfaceController = function (textyObj) {
+    var InterfaceController = function (world, gameState) {
 
     	var self = this;
 
-        self.textyObj = textyObj;
+        self.world = world;
+        self.gameState = gameState;
 
         // Set different types of interfaces
         self.rooms = {}
-        self.objects = objectInterfaceController(this.textyObj);
+        self.objects = objectInterfaceController(self.textyObj, self.world, self.gameState);
         self.npcs = {}
         self.party = {}
-        self.players = playerInterfaceController(this.textyObj);
+        self.players = playerInterfaceController(self.textyObj, self.world, self.gameState);
 
         console.log('InterfaceController initialized');
 
     }
 
     // Assign to exports
+
     return function (textyObj) {
-    	return (new InterfaceController(textyObj));
+
+        InterfaceController.prototype.textyObj = textyObj;
+    	
+        return function (world, gameState) {
+            return (new InterfaceController(world, gameState));
+        }
+
     };
 
 });

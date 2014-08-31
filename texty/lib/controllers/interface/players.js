@@ -7,13 +7,13 @@ function (utils) {
     var Utils = utils();
 
     // Create the constructor
-    var PlayerInterfaceController = function (textyObj) {
+    var PlayerInterfaceController = function (textyObj, world, gameState) {
 
     	var self = this;
 
         self.textyObj = textyObj;
-
-        console.log('PlayerInterfaceController initialized');
+        self.world = world;
+        self.gameState = gameState;
 
     }
 
@@ -21,14 +21,22 @@ function (utils) {
     // Interface methods start
     PlayerInterfaceController.prototype.removeObject = function (objName, quantity) {
         // WTF?! Change this IMMEDIATELY!!
-    	this.textyObj.players['nk'].warehouse.inventory[objName] = this.textyObj.players['nk'].warehouse.inventory[objName] - quantity;
+    	this.gameState.warehouse.inventory[objName] = this.gameState.warehouse.inventory[objName] - quantity;
     }
 
 
+    PlayerInterfaceController.prototype.addObject = function (objName, quantity) {
+        if (!this.gameState.warehouse.inventory[objName]) {
+            this.gameState.warehouse.inventory[objName] = 0;
+        }
+
+        this.gameState.warehouse.inventory[objName] = this.gameState.warehouse.inventory[objName] + quantity;
+    }
+
 
     // Assign to exports
-    return function (textyObj) {
-    	return (new PlayerInterfaceController(textyObj));
+    return function (textyObj, world, gameState) {
+    	return (new PlayerInterfaceController(textyObj, world, gameState));
     };
 
 });

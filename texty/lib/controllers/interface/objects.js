@@ -7,28 +7,27 @@ function (utils) {
     var Utils = utils();
 
     // Create the constructor
-    var ObjectInterfaceController = function (textyObj) {
+    var ObjectInterfaceController = function (textyObj, world, gameState) {
 
     	var self = this;
 
         self.textyObj = textyObj;
-
-
-        console.log('ObjectInterfaceController initialized');
+        self.world = world;
+        self.gameState = gameState;
 
     }
 
 
     // Interface methods start
     ObjectInterfaceController.prototype.setDescription = function (objName, description) {
-    	this.textyObj.world.objects[objName].description = description;
+    	this.world.objects[objName].description = description;
     }
 
 
 
     // Assign to exports
-    return function (textyObj) {
-    	return (new ObjectInterfaceController(textyObj));
+    return function (textyObj, world, gameState) {
+    	return (new ObjectInterfaceController(textyObj, world, gameState));
     };
 
 });
