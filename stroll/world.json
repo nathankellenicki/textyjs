@@ -21,7 +21,10 @@
             "objects": {
                 "campfire": 1,
                 "stick": 1
-            }
+            },
+            "npcs": [
+                "gnoll"
+            ]
         },
         "river": {
             "description": "As you walk, you stumble across a small river. Despite it's size, you can see it's flowing quite rapidly and looks quite dangerous. Looking around, you can also see an underground hatch. It looks like it's been closed for decades.",
@@ -48,7 +51,10 @@
             },
             "objects": {
                 "torch": 1
-            }
+            },
+            "npcs": [
+                "gnoll"
+            ]
         }
     },
     "objects": {
@@ -82,7 +88,7 @@
                 }
             }
         },
-        "broken stick": {
+        "brokenstick": {
             "description": "A broken piece of stick. It looks like it was once part of a larger stick."
         },
         "torch": {
@@ -90,5 +96,27 @@
             "description": "A wooden torch. It's not lit. Perhaps you should light it."
         }
     },
-    "characters": []
+    "npcs": {
+        "gnoll": {
+            "name": "Henry",
+            "description": ", a river gnoll",
+            "conversation": {
+                "say": "Hello traveller! And how are you this fine day?",
+                "you": [
+                    {
+                        "say": "I have a little bit of a headache at the moment, where am I?!",
+                        "them": {
+                            "say": "Well then, we should sort that out. You're down inside a hatch."
+                        }
+                    },
+                    {
+                        "say": "I'm very well, please don't bother me with such pleasantries. Where am I?",
+                        "them": {
+                            "say": "Alright, don't be so snippy. You're inside a hatch."
+                        }
+                    }
+                ]
+            }
+        }
+    }
 }

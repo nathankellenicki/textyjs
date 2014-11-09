@@ -25,6 +25,10 @@
 				"items": "Items in your inventory:\r\n{{#items}}{{count}}x \u001b[1m{{& name}}\u001b[0m\r\n{{/items}}\r\n\r\n",
 				"noitems": "There are no items in your inventory.\r\n\r\n"
 			}
+		},
+		"characters": {
+			"show": "Characters nearby:\r\n{{#characters}}\u001b[1m{{& name}}\u001b[0m{{& description}}\r\n{{/characters}}\r\n\r\n",
+			"none": "There are no characters nearby.\r\n\r\n"
 		}
 	},
 	"social": {

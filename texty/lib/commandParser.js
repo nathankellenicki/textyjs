@@ -180,6 +180,9 @@ function (utils) {
 					}
 				}
 
+				// Start a conversation with an npc
+				
+
 				break;
 
 		}

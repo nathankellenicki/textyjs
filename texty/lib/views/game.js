@@ -42,6 +42,7 @@ function (utils, Mustache) {
 
 	    msg += this.displayDirections(world, gameState, room);
 	    msg += this.displayItems(world, gameState, room);
+	    msg += this.displayCharacters(world, gameState, room);
 
 	    return msg;
 
@@ -64,12 +65,12 @@ function (utils, Mustache) {
 				});
 			}
 
-			msg += Mustache.render(gameState.template.game.directions.exists, {
+			msg = Mustache.render(gameState.template.game.directions.exists, {
 				directions: directions
 			});
 
 		} else {
-			msg += Mustache.render(gameState.template.game.directions.none);
+			msg = Mustache.render(gameState.template.game.directions.none);
 		}
 		
 		return msg;
@@ -95,12 +96,12 @@ function (utils, Mustache) {
 				}
 			}
 
-			msg += Mustache.render(gameState.template.game.items.listing.items, {
+			msg = Mustache.render(gameState.template.game.items.listing.items, {
 				items: items
 			});
 
 		} else {
-			msg += Mustache.render(gameState.template.game.items.listing.noitems);
+			msg = Mustache.render(gameState.template.game.items.listing.noitems);
 		}
 
 		return msg;
@@ -126,12 +127,47 @@ function (utils, Mustache) {
 				}
 			}
 
-			msg += Mustache.render(gameState.template.game.inventory.listing.items, {
+			msg = Mustache.render(gameState.template.game.inventory.listing.items, {
 				items: items
 			});
 
 		} else {
 			msg = Mustache.render(gameState.template.game.inventory.listing.noitems);
+		}
+
+		return msg;
+
+	}
+
+
+	// Show the characters
+	GameView.prototype.displayCharacters = function (world, gameState, room) {
+
+		var npcs = world.rooms[room].npcs,
+			msg = '';
+
+		if (npcs && npcs.length > 0) {		
+
+			var characters = [];
+
+			for (var npc in npcs) {
+				if (world.npcs[npcs[npc]]) {
+
+					npcObj = world.npcs[npcs[npc]];
+					characters.push({
+						name: npcObj.name,
+						description: npcObj.description
+					});
+
+				}
+			}
+
+			msg = Mustache.render(gameState.template.game.characters.show, {
+				characters: characters
+			});
+
+		} else {
+			msg = Mustache.render(gameState.template.game.characters.none);
 		}
 
 		return msg;
