@@ -106,7 +106,12 @@
                     {
                         "say": "I have a little bit of a headache at the moment, where am I?!",
                         "them": {
-                            "say": "Well then, we should sort that out. You're down inside a hatch."
+                            "say": "Well then, we should sort that out. You're down inside a hatch.",
+                            "you": [
+                                {
+                                    "say": "Right, thanks. I knew that already."
+                                }
+                            ]
                         }
                     },
                     {

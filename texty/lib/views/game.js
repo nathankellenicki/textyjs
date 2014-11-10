@@ -199,6 +199,29 @@ function (utils, Mustache) {
 	}
 
 
+	// Show current character conversation point
+	GameView.prototype.showConversation = function (world, gameState) {
+
+		var speak = {
+			name: gameState.state.npcRef.name,
+			say: gameState.state.conversationPoint.say,
+			options: []
+		}
+
+		for (var option in gameState.state.conversationPoint.you) {
+			speak.options.push({
+				number: (parseInt(option, 10) + 1),
+				say: gameState.state.conversationPoint.you[option].say
+			})
+		}
+
+		console.log(speak);
+
+		return Mustache.render(gameState.template.game.characters.speak, speak);
+
+	}
+
+
 	// Assign to exports
 	return function () {
 		return (new GameView());

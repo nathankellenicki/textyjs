@@ -156,6 +156,37 @@ function (Mustache, gameView, utils) {
     }
 
 
+    // Start a conversation with an NPC
+    GameController.prototype.startConversation = function (world, gameState, name, callback) {
+
+        var Texty = this.textyObj,
+            character = false;
+
+        for (var npc in world.npcs) {
+            if (world.npcs[npc].name.toLowerCase() == name.toLowerCase()) {
+                character = world.npcs[npc];
+            }
+        }
+
+        if (character) {
+
+            gameState.state = {
+                type: Texty.PlayerState.NPC_CONVERSATION,
+                npcRef: character,
+                conversationPoint: character.conversation
+            }
+
+            callback(this.view.showConversation(world, gameState));
+
+        } else {
+            callback(Mustache.render(gameState.template.game.characters.doesntexist));
+        }
+
+    }
+
+
+
+
     // Assign to exports
     return function (textyObj) {
     	return (new GameController(textyObj));

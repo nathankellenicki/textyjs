@@ -71,6 +71,11 @@ function (utils) {
 
 				break;
 
+			case Texty.PlayerState.NPC_CONVERSATION:
+
+				console.log('In conversation with character');
+				break;
+
 			default: // Texty.PlayerState.ROOM
 
 				commandList['inventory'] = function (world, gameState, options, callback) {
@@ -181,6 +186,9 @@ function (utils) {
 				}
 
 				// Start a conversation with an npc
+				commandList['talk to'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.startConversation(world, gameState, options, callback);
+				}
 				
 
 				break;
