@@ -185,6 +185,17 @@ function (Mustache, gameView, utils) {
     }
 
 
+    // Action a conversation choice
+    GameController.prototype.conversationChoice = function (world, gameState, choice, callback) {
+        
+        choice = (parseInt(choice, 10) - 1);
+
+        gameState.state.conversationPoint = gameState.state.conversationPoint.you[choice].them;
+        callback(this.view.showConversation(world, gameState));
+
+    }
+
+
 
 
     // Assign to exports

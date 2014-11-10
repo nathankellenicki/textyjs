@@ -73,7 +73,18 @@ function (utils) {
 
 			case Texty.PlayerState.NPC_CONVERSATION:
 
-				console.log('In conversation with character');
+				for (var option in gameState.state.conversationPoint.you) {
+
+					var number = (parseInt(option, 10) + 1);
+
+					(function (number) {
+						commandList[number] = function (world, gameState, options, callback) {
+							self.textyObj.controllers.game.conversationChoice(world, gameState, number, callback);
+						}
+					})(number);
+
+				}
+
 				break;
 
 			default: // Texty.PlayerState.ROOM
