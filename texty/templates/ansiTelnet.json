@@ -30,7 +30,9 @@
 			"show": "Characters nearby:\r\n{{#characters}}\u001b[1m{{& name}}\u001b[0m{{& description}}\r\n{{/characters}}\r\n\r\n",
 			"none": "There are no characters nearby.\r\n\r\n",
 			"doesntexist": "That character isn't here right now.\r\n\r\n",
-			"speak": "{{& name}}: {{& say}}\r\n\r\nChoose your response:\r\n{{#options}}{{number}}) {{& say}}\r\n{{/options}}\r\n\r\n"
+			"speak": "{{& name}}: {{& say}}\r\n\r\n",
+			"conversationoptions": "Choose your response:\r\n{{#options}}{{number}}) {{& say}}\r\n{{/options}}\r\n\r\n",
+			"endconversation": "You stop talking to {{name}}.\r\n\r\n"
 		}
 	},
 	"social": {

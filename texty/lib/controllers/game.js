@@ -188,13 +188,51 @@ function (Mustache, gameView, utils) {
     // Action a conversation choice
     GameController.prototype.conversationChoice = function (world, gameState, choice, callback) {
         
+        var Texty = this.textyObj,
+            msg = '';
+
         choice = (parseInt(choice, 10) - 1);
 
+        // I'm not too keen on this next few lines...additional work needed.
+        var them = gameState.state.conversationPoint.you[choice].them;
+
         gameState.state.conversationPoint = gameState.state.conversationPoint.you[choice].them;
-        callback(this.view.showConversation(world, gameState));
+
+        if (them) {
+            msg = this.view.showConversation(world, gameState);
+        }
+
+        if (!gameState.state.conversationPoint || !gameState.state.conversationPoint.you || (gameState.state.conversationPoint.you && gameState.state.conversationPoint.you.length <= 0)) {
+
+            msg += Mustache.render(gameState.template.game.characters.endconversation, {
+                name: gameState.state.npcRef.name
+            });
+
+            gameState.state = {
+                type: Texty.PlayerState.ROOM
+            }
+
+        }
+
+        callback(msg);
 
     }
 
+
+    // Stop talking to a character
+    GameController.prototype.stopTalking = function (world, gameState, callback) {
+
+        var Texty = this.textyObj;
+
+        callback(Mustache.render(gameState.template.game.characters.endconversation, {
+            name: gameState.state.npcRef.name
+        }));
+
+        gameState.state = {
+            type: Texty.PlayerState.ROOM
+        }
+
+    }
 
 
 

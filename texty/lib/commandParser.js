@@ -85,6 +85,10 @@ function (utils) {
 
 				}
 
+				commandList['stop talking'] = function (world, gameState, options, callback) {
+					self.textyObj.controllers.game.stopTalking(world, gameState, callback);
+				}
+
 				break;
 
 			default: // Texty.PlayerState.ROOM
