@@ -6,7 +6,7 @@ Texty.js is a multiplayer text-adventure game engine, written in Javascript and 
 
 The multiplayer features include parties and instancing, person-to-person and group based chat, and a shared world.
 
-To try it out, telnet to the example server: “telnet nathankunicki.com 10070” (Use any username and password). If you get stuck with what to do, type “help” to see a list of available commands.
+To try it out, telnet to the example server: “telnet stratus.nathankunicki.com 10070” (Use any username and password). If you get stuck with what to do, type “help” to see a list of available commands.
 
 ## Installation
 
