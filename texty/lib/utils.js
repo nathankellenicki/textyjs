@@ -18,6 +18,8 @@ function () {
 
 	}
 
+
+	// Return an array of properties in an object/hash
 	Utils.prototype.objectProperties = function (obj) {
 
 		var arr = [];
@@ -33,9 +35,17 @@ function () {
 	}
 
 
+	// Wrapper for setting a timeout on different platforms
 	Utils.prototype.setTimeout = function (callback, delay) {
 		return setTimeout(callback, delay);
 	}
+
+
+	// Stripping a string of all non-essential characters
+	Utils.prototype.stringClean = function (str) {
+		return str.replace(/[^\w\s]/gi, '').trim();
+	}
+
 
 	return function () {
 		return (new Utils());

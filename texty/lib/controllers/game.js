@@ -1,8 +1,12 @@
 define([
     'mustache',
-    'texty/lib/views/game'
+    'texty/lib/views/game',
+    'texty/lib/utils'
 ],
-function (Mustache, gameView) {
+function (Mustache, gameView, utils) {
+
+    // Load modules
+    var Utils = utils();
 
     // Create the constructor
     var GameController = function (textyObj) {
@@ -19,6 +23,12 @@ function (Mustache, gameView) {
     // Welcome method
     GameController.prototype.welcome = function (world, gameState) {
         return this.view.displayWelcome(world, gameState);
+    }
+
+
+    // Help method
+    GameController.prototype.commandList = function (gameState, commandList, callback) {
+        callback(this.view.displayCommandList(gameState, Utils.objectProperties(commandList)));
     }
 
 
@@ -144,6 +154,86 @@ function (Mustache, gameView) {
         }
 
     }
+
+
+    // Start a conversation with an NPC
+    GameController.prototype.startConversation = function (world, gameState, name, callback) {
+
+        var Texty = this.textyObj,
+            character = false;
+
+        for (var npc in world.npcs) {
+            if (world.npcs[npc].name.toLowerCase() == name.toLowerCase()) {
+                character = world.npcs[npc];
+            }
+        }
+
+        if (character) {
+
+            gameState.state = {
+                type: Texty.PlayerState.NPC_CONVERSATION,
+                npcRef: character,
+                conversationPoint: character.conversation
+            }
+
+            callback(this.view.showConversation(world, gameState));
+
+        } else {
+            callback(Mustache.render(gameState.template.game.characters.doesntexist));
+        }
+
+    }
+
+
+    // Action a conversation choice
+    GameController.prototype.conversationChoice = function (world, gameState, choice, callback) {
+        
+        var Texty = this.textyObj,
+            msg = '';
+
+        choice = (parseInt(choice, 10) - 1);
+
+        // I'm not too keen on this next few lines...additional work needed.
+        var them = gameState.state.conversationPoint.you[choice].them;
+
+        gameState.state.conversationPoint = gameState.state.conversationPoint.you[choice].them;
+
+        if (them) {
+            msg = this.view.showConversation(world, gameState);
+        }
+
+        if (!gameState.state.conversationPoint || !gameState.state.conversationPoint.you || (gameState.state.conversationPoint.you && gameState.state.conversationPoint.you.length <= 0)) {
+
+            msg += Mustache.render(gameState.template.game.characters.endconversation, {
+                name: gameState.state.npcRef.name
+            });
+
+            gameState.state = {
+                type: Texty.PlayerState.ROOM
+            }
+
+        }
+
+        callback(msg);
+
+    }
+
+
+    // Stop talking to a character
+    GameController.prototype.stopTalking = function (world, gameState, callback) {
+
+        var Texty = this.textyObj;
+
+        callback(Mustache.render(gameState.template.game.characters.endconversation, {
+            name: gameState.state.npcRef.name
+        }));
+
+        gameState.state = {
+            type: Texty.PlayerState.ROOM
+        }
+
+    }
+
 
 
     // Assign to exports

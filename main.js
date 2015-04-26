@@ -6,14 +6,19 @@ var requirejs = require('requirejs');
 requirejs.config({
     nodeRequire: require,
     paths: {
+        // Load Texty and connection modules
         Texty: 'texty/texty',
         TCPConnection: 'texty/lib/connections/tcp',
-        OrchestrateStore: 'texty/lib/auth/orchestrate'
+        OrchestrateStore: 'texty/lib/auth/redis',
+
+        // Load the object action files (And the world and templates, but need to figure out a way to make it work)
+        CampfireActions: 'stroll/campfire',
+        StickActions: 'stroll/stick'
     }
 });
 
-requirejs(['Texty', 'TCPConnection', 'OrchestrateStore', 'fs'],
-function (Texty, TCPConnection, OrchestrateStore, fs) {
+requirejs(['Texty', 'TCPConnection', 'OrchestrateStore', 'fs', 'CampfireActions', 'StickActions'],
+function (Texty, TCPConnection, OrchestrateStore, fs, campfireActions, stickActions) {
 
     // Load the game module and template (This should come in via RequireJS)
     var world = JSON.parse(fs.readFileSync(__dirname + '/stroll/world.json')),
@@ -21,7 +26,11 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
 
     // Initialize the Texty module with the game
     var game = new Texty({
-        world: world
+        world: world,
+        actions: {
+            'campfire': campfireActions,
+            'stick': stickActions
+        }
     });
 
     // Initialize the TCP connection
@@ -50,9 +59,16 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
 
         // Authentication logic
         if (!session.auth.authenticated) {
-            if (!session.auth.username) {
-                session.auth.username = command;
-                callback('Please enter your password:\r\n');
+            if (!session.auth.username || session.auth.username == '') {
+
+                // Check if the entered username was blank
+                if (command != '') {
+                    session.auth.username = command;
+                    callback('\r\nPlease enter your password:\r\n');
+                } else {
+                    callback('Invalid username. Please enter your username:\r\n');
+                }
+
             } else if (!session.auth.authenticated) {
 
                 // Authenticate against the db (I should really check for success/failure)
@@ -63,21 +79,16 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
                         session.auth.authenticated = true;
                         session.auth.userId = res;
 
-                        sessionsByUser[session.auth.username] = session;
-                        sessionsById[session.sessionId] = session;
-
                         // Now that we're authenticated, attempt to load the game state from Redis
                         db.load(session.auth.userId, function (err, res) {
 
                             if (!err) {
                                 // Convert the loaded user state object into a compatible game state
                                 session.gameState = game.initializeState(session.auth.userId, res, template);
-                                console.log('Game state loaded for user id ' + session.auth.userId);
                                 callback(game.displayWelcome(session.gameState));
                             } else {
                                 // Create a new user game state object
                                 session.gameState = game.createNewState(session.auth.userId, template);
-                                console.log('Game state created from scratch for user id ' + session.auth.userId);
                                 callback(game.displayWelcome(session.gameState));
                             }
 
@@ -87,8 +98,7 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
 
                         // Username and password not found
                         delete session.auth.username;
-                        console.log('User id not found');
-                        callback('User not found, please try again.');
+                        callback('\r\nAuthentication failed. Please enter your username:\r\n');
 
                     }
 
@@ -101,6 +111,8 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
                 // Begin the game and show the players last state
                 session.auth.started = true;
                 game.start(session.gameState, function (data) {
+                    sessionsByUser[session.auth.username] = session;
+                    sessionsById[session.sessionId] = session;
                     callback(data);
                 });
                 return;
@@ -116,10 +128,17 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
         }
     });
 
+
+    // Handle a user disconnect
     tcp.on('disconnect', function (session) {
-        game.quit(sessionsById[session.sessionId].auth.username);
+        // If this isn't set, they were never properly in the game
+        if (sessionsById[session.sessionId]) {
+            game.quit(sessionsById[session.sessionId].auth.username);
+        }
     });
 
+
+    // Handle game triggered events where a user needs notified
     game.on('gameEvent', function (gameState, data) {
         if (sessionsByUser[gameState.player]) {
             tcp.sendData(sessionsByUser[gameState.player].sessionId, data);
@@ -129,11 +148,15 @@ function (Texty, TCPConnection, OrchestrateStore, fs) {
         }
     });
 
+
+    // Handle a user quitting the game
     game.on('quit', function (gameState) {
         // Force tcp disconnect
-        tcp.endConnection(sessionsByUser[gameState.player].sessionId);
-        delete sessionsById[sessionsByUser[gameState.player].sessionId];
-        delete sessionsByUser[gameState.player];
+        if (gameState) {
+            tcp.endConnection(sessionsByUser[gameState.player].sessionId);
+            delete sessionsById[sessionsByUser[gameState.player].sessionId];
+            delete sessionsByUser[gameState.player];
+        }
     });
 
 });

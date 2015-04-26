@@ -21,6 +21,16 @@ function (utils, Mustache) {
 	}
 
 
+	// Format the command list
+	GameView.prototype.displayCommandList = function (gameState, commandList) {
+
+	    return Mustache.render(gameState.template.game.help, {
+	    	commands: commandList
+	    });
+
+	}
+
+
 	// Format room display
 	GameView.prototype.displayRoom = function (world, gameState, room) {
 
@@ -32,6 +42,7 @@ function (utils, Mustache) {
 
 	    msg += this.displayDirections(world, gameState, room);
 	    msg += this.displayItems(world, gameState, room);
+	    msg += this.displayCharacters(world, gameState, room);
 
 	    return msg;
 
@@ -54,12 +65,12 @@ function (utils, Mustache) {
 				});
 			}
 
-			msg += Mustache.render(gameState.template.game.directions.exists, {
+			msg = Mustache.render(gameState.template.game.directions.exists, {
 				directions: directions
 			});
 
 		} else {
-			msg += Mustache.render(gameState.template.game.directions.none);
+			msg = Mustache.render(gameState.template.game.directions.none);
 		}
 		
 		return msg;
@@ -85,12 +96,12 @@ function (utils, Mustache) {
 				}
 			}
 
-			msg += Mustache.render(gameState.template.game.items.listing.items, {
+			msg = Mustache.render(gameState.template.game.items.listing.items, {
 				items: items
 			});
 
 		} else {
-			msg += Mustache.render(gameState.template.game.items.listing.noitems);
+			msg = Mustache.render(gameState.template.game.items.listing.noitems);
 		}
 
 		return msg;
@@ -116,12 +127,47 @@ function (utils, Mustache) {
 				}
 			}
 
-			msg += Mustache.render(gameState.template.game.inventory.listing.items, {
+			msg = Mustache.render(gameState.template.game.inventory.listing.items, {
 				items: items
 			});
 
 		} else {
 			msg = Mustache.render(gameState.template.game.inventory.listing.noitems);
+		}
+
+		return msg;
+
+	}
+
+
+	// Show the characters
+	GameView.prototype.displayCharacters = function (world, gameState, room) {
+
+		var npcs = world.rooms[room].npcs,
+			msg = '';
+
+		if (npcs && npcs.length > 0) {		
+
+			var characters = [];
+
+			for (var npc in npcs) {
+				if (world.npcs[npcs[npc]]) {
+
+					npcObj = world.npcs[npcs[npc]];
+					characters.push({
+						name: npcObj.name,
+						description: npcObj.description
+					});
+
+				}
+			}
+
+			msg = Mustache.render(gameState.template.game.characters.show, {
+				characters: characters
+			});
+
+		} else {
+			msg = Mustache.render(gameState.template.game.characters.none);
 		}
 
 		return msg;
@@ -150,6 +196,39 @@ function (utils, Mustache) {
 		return Mustache.render(gameState.template.game.items.drop, {
 			name: item
 		});
+	}
+
+
+	// Show current character conversation point
+	GameView.prototype.showConversation = function (world, gameState) {
+
+		var msg = '',
+			speak = {
+				name: gameState.state.npcRef.name,
+				say: gameState.state.conversationPoint.say
+			};
+
+		msg = Mustache.render(gameState.template.game.characters.speak, speak);
+
+		if (gameState.state.conversationPoint.you && gameState.state.conversationPoint.you.length > 0) {
+
+			speak.options = [];
+
+			for (var option in gameState.state.conversationPoint.you) {
+
+				speak.options.push({
+					number: (parseInt(option, 10) + 1),
+					say: gameState.state.conversationPoint.you[option].say
+				})
+
+			}
+
+			msg += Mustache.render(gameState.template.game.characters.conversationoptions, speak);
+
+		}
+
+		return msg;
+
 	}
 
 

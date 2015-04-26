@@ -5,8 +5,9 @@ define([
     'texty/lib/commandParser',
     'texty/lib/controllers/game',
     'texty/lib/controllers/social',
+    'texty/lib/controllers/interface/interface'
 ],
-function (require, utils, commandParser, gameController, socialController) {
+function (require, utils, commandParser, gameController, socialController, interfaceController) {
 
     // Create the constructor
     var Texty = function (config) {
@@ -23,8 +24,11 @@ function (require, utils, commandParser, gameController, socialController) {
 
         self.controllers = {
             game: gameController(self),
-            social: socialController(self)
+            social: socialController(self),
+            interface: interfaceController(self)
         };
+
+        self.objectModules = config.actions;
 
         // Start the world
         self.worldTemplate = config.world;
@@ -42,11 +46,22 @@ function (require, utils, commandParser, gameController, socialController) {
 
     }
 
+    
+    // Define player state constants
+    Texty.prototype.PlayerState = {
+        'ROOM': 0,
+        'PARTY_INVITE': 1,
+        'NPC_CONVERSATION': 2
+    }
+
+
     // Convert a datastore object to a game object
     Texty.prototype.initializeState = function (player, stateObj, template) {
         return {
             player: player,
-            state: 'room',
+            state: {
+                type: this.PlayerState.ROOM
+            },
             template: template,
             roomHistory: [],
             warehouse: stateObj
@@ -59,7 +74,9 @@ function (require, utils, commandParser, gameController, socialController) {
         // NOTE: Perhaps not the most performant way of doing this?!
         return {
             player: player,
-            state: 'room',
+            state: {
+                type: this.PlayerState.ROOM
+            },
             template: template,
             roomHistory: [],
             warehouse: JSON.parse(JSON.stringify(this.world.player))
@@ -98,7 +115,7 @@ function (require, utils, commandParser, gameController, socialController) {
         }
 
         // Drop the party if the player is in one
-        this.controllers.social.dropParty(gameState, function (msg) {});
+        this.controllers.social.dropParty(gameState);
 
         // Trigger the event (NOTE: Could cause a circular loop?)
         this.triggerGameEvent('quit', gameState, null);

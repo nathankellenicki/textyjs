@@ -1,6 +1,7 @@
 {
 	"game": {
 		"welcome": "\r\n----------\r\n\r\n\u001b[1m{{& title}}\u001b[0m\r\n\r\n{{& greeting}}\r\n\r\nTo continue, press \u001b[1menter\u001b[0m",
+		"help": "Commands:\r\n{{#commands}}\u001b[1m{{.}}\r\n\u001b[0m{{/commands}}\r\n",
 		"room": "\r\n----------\r\n\r\n{{& description}}\r\n\r\n",
 		"directions": {
 			"exists": "Directions:\r\n{{#directions}}\u001b[1m{{& direction}}\u001b[0m {{& description}}\r\n{{/directions}}\r\n\r\n",
@@ -24,13 +25,22 @@
 				"items": "Items in your inventory:\r\n{{#items}}{{count}}x \u001b[1m{{& name}}\u001b[0m\r\n{{/items}}\r\n\r\n",
 				"noitems": "There are no items in your inventory.\r\n\r\n"
 			}
+		},
+		"characters": {
+			"show": "Characters nearby:\r\n{{#characters}}\u001b[1m{{& name}}\u001b[0m{{& description}}\r\n{{/characters}}\r\n\r\n",
+			"none": "There are no characters nearby.\r\n\r\n",
+			"doesntexist": "That character isn't here right now.\r\n\r\n",
+			"speak": "{{& name}}: {{& say}}\r\n\r\n",
+			"conversationoptions": "Choose your response:\r\n{{#options}}{{number}}) {{& say}}\r\n{{/options}}\r\n\r\n",
+			"endconversation": "You stop talking to {{name}}.\r\n\r\n"
 		}
 	},
 	"social": {
 		"messaging": {
 			"sent": "Message sent.\r\n\r\n",
 			"received": "Message from {{& fromPlayer}}: {{& message}}\r\n\r\n",
-			"notsent": "Could not send message to {{& toPlayer}}.\r\n\r\n"
+			"notsent": "Could not send message to {{& toPlayer}}.\r\n\r\n",
+			"playerdoesntexist": "Cannot find {{& toPlayer}}.\r\n\r\n"
 		},
 		"party": {
 			"cannotinviteself": "You cannot invite yourself to a party.\r\n\r\n",
@@ -38,11 +48,15 @@
 			"alreadyinparty": "Player is already in a party.\r\n\r\n",
 			"notinparty": "You are not in a party.\r\n\r\n",
 			"ininstance": "You cannot invite a player located in an instanced area.\r\n\r\n",
-			"addedby": "You were added to a party by {{& fromPlayer}}.\r\n\r\n",
 			"playerjoined": "{{& player}} joined the party.\r\n\r\n",
 			"playerleft": "{{& player}} left the party.\r\n\r\n",
 			"partydropped": "You have left the party.\r\n\r\n",
 			"partydisbanded": "Your party was disbanded.\r\n\r\n",
+			"invitereceived": "You were invited to a party by {{& fromPlayer}}, do you want to join? (yes/no)\r\n",
+			"invitesent": "Party invite sent to {{& toPlayer}}.\r\n\r\n",
+			"inviteaccepted": "Joined party.\r\n\r\n",
+			"invitedeclined": "Party invite declined.\r\n\r\n",
+			"pendinginvite": "This player already has a pending invite.\r\n\r\n",
 			"kickedfrominstance": "Being alone in there got to you after a while. You retreat back to the last safe place you were at.\r\n\r"
 		},
 		"area": {

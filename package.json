@@ -13,6 +13,6 @@
 		"orchestrate": "0.2.x"
 	},
 	"engines": {
-		"node": ">=0.10.24"
+		"node": ">=0.10.0"
 	}
 }
